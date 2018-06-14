@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\jpeg1.jpg" />
+    <None Remove="Templates\jpeg100.jpg" />
+    <None Remove="Templates\jpeg25.jpg" />
+    <None Remove="Templates\jpeg250.jpg" />
+    <None Remove="Templates\jpeg5.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\jpeg25.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\jpeg1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\jpeg100.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\jpeg250.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\jpeg5.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DLLs\" />
+    <Folder Include="Import\" />
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Barcodes.Pdf417" Version="1.0.1" />
+    <PackageReference Include="NETStandardBarcode" Version="1.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="QRCoder" Version="1.3.3" />
+    <PackageReference Include="SkiaSharp" Version="1.60.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0" />
+ <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
+ <PackageReference Include="ZXing.Net" Version="0.16.4" />
+ 
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="FounderSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+</Project>
