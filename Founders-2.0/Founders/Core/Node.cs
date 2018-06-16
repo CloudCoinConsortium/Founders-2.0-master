@@ -1,4 +1,5 @@
 ﻿using CloudCoinCoreDirectory;
+using CoreAPIs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,8 @@ namespace CloudCoinCore
         public MultiDetectResponse MultiResponse = new MultiDetectResponse();
         public String Ticket = "";
         RAIDANode node;
+        public NodeEchoResponse echoresult;
+        public NodeEchoResponse echresponses;
 
         //Constructor
         public Node(int NodeNumber)
@@ -119,7 +122,7 @@ namespace CloudCoinCore
         public async Task<Response> Echo()
         {
             Response echoResponse = new Response();
-            echoResponse.fullRequest = this.FullUrl + "echo?b=t";
+            echoResponse.fullRequest = this.FullUrl + "echo";
             DateTime before = DateTime.Now;
             FailsEcho = true;
             //RAIDA_Status.failsEcho[raidaID] = true;
@@ -127,6 +130,8 @@ namespace CloudCoinCore
             {
                 echoResponse.fullResponse = await Utils.GetHtmlFromURL(echoResponse.fullRequest);
                 Debug.WriteLine("Echo From Node - " + NodeNumber + ". " + echoResponse.fullResponse);
+                echoresult =  JsonConvert.DeserializeObject<NodeEchoResponse>(echoResponse.fullResponse);
+
                 //Debug.WriteLine("Echo URL - "+ FullUrl);
                 if (echoResponse.fullResponse.Contains("ready"))
                 {

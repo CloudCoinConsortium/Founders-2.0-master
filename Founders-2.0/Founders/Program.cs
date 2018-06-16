@@ -10,11 +10,11 @@ using CloudCoinCoreDirectory;
 using System.Net;
 using Newtonsoft.Json;
 using Celebrium;
-using ZXing;
 using QRCoder;
 using System.Drawing;
 using CloudCoinClient.CoreClasses;
 using McMaster.Extensions.CommandLineUtils;
+using ConsoleTables;
 
 namespace Founders
 {
@@ -69,10 +69,6 @@ namespace Founders
             Console.WriteLine("10. Exit");
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
-        }
-        public class AppSettings
-        {
-            public string Hello { get; set; }
         }
 
 
@@ -168,7 +164,12 @@ namespace Founders
               CommandOptionType.NoValue);
             commandLineApplication.HelpOption("-? | -h | --help");
 
-            CommandOption echo = commandLineApplication.Option(
+            CommandOption stats = commandLineApplication.Option(
+  "-$|-s |--stats ",
+  "Displays RAIDA statistics of all networks", CommandOptionType.NoValue);
+
+
+CommandOption echo = commandLineApplication.Option(
               "-$|-e |--echo ",
               "The greeting to display. The greeting supports"
               + " a format string where {fullname} will be "
@@ -248,6 +249,10 @@ namespace Founders
                     if (greeting.HasValue())
                     {
                         printWelcome();
+                    }
+                    if(stats.HasValue())
+                    {
+                        await EchoRaidas();
                     }
                     if (total.HasValue())
                     {
@@ -340,7 +345,7 @@ namespace Founders
             switch (input)
             {
                 case 1:
-                    await EchoRaida();
+                    await EchoRaidas();
                     break;
                 case 2:
                     showCoins();
@@ -427,6 +432,54 @@ namespace Founders
             Console.Out.WriteLine("CloudCoin.HelpDesk@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
 
         }//End Help
+
+        public async static Task EchoRaidas()
+        {
+            var networks = (from x in RAIDA.networks
+                            select x).Distinct().ToList();
+            foreach (var network in networks)
+            {
+                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", network.NetworkNumber));
+                Console.Out.WriteLine("----------------------------------\n");
+                var echos = network.GetEchoTasks();
+
+                await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
+                Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
+                Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+                try
+                {
+                    var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
+
+                    for (int i = 0; i < network.nodes.Count(); i++)
+                    {
+                        if(network.nodes[i].echoresult!=null)
+                        table.AddRow("RAIDA " + i, network.nodes[i].RAIDANodeStatus == NodeStatus.Ready ? "Ready" : "Not Ready", network.nodes[i].echoresult.message, network.nodes[i].echoresult.version, network.nodes[i].echoresult.time);
+                        else
+                            table.AddRow("RAIDA " + i, network.nodes[i].RAIDANodeStatus == NodeStatus.Ready ? "Ready" : "Not Ready", "", "", "");
+                    }
+
+                    table.Write();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                Console.Out.WriteLine("-----------------------------------\n");
+
+
+            }
+
+            Console.WriteLine();
+
+            //var rows = Enumerable.Repeat(new Something(), 10);
+
+            //ConsoleTable
+            //   .From<Something>(rows)
+            //   .Write(Format.Alternative);
+
+            //Console.ReadKey();
+
+        }
 
         public async static Task EchoRaida()
         {

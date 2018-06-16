@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using Founders;
-using ZXing;
-using ZXing.Common;
 using Newtonsoft.Json;
 
 namespace CloudCoinCore

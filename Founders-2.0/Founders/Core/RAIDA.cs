@@ -249,7 +249,7 @@ namespace CloudCoinCore
                     FS.WriteCoin(coins, FS.DetectedFolder);
                     FS.RemoveCoins(coins, FS.PreDetectFolder);
 
-
+                    updateLog(pge.MinorProgress + " % of Coins on Network " + NetworkNumber + " processed.");
                     //FS.WriteCoin(coins, FS.DetectedFolder);
 
                 }
@@ -275,6 +275,10 @@ namespace CloudCoinCore
                                where x.folder == FS.BankFolder
                                select x).ToList();
 
+            var frackedCoins = (from x in detectedCoins
+                               where x.folder == FS.FrackedFolder
+                               select x).ToList();
+
             var failedCoins = (from x in detectedCoins
                                where x.folder == FS.CounterfeitFolder
                                select x).ToList();
@@ -285,16 +289,17 @@ namespace CloudCoinCore
                                 where x.folder == FS.SuspectFolder
                                 select x).ToList();
 
-            Debug.WriteLine("Total Passed Coins - " + passedCoins.Count());
+            Debug.WriteLine("Total Passed Coins - " + (passedCoins.Count()+ frackedCoins.Count()));
             Debug.WriteLine("Total Failed Coins - " + failedCoins.Count());
             updateLog("Coin Detection finished.");
-            updateLog("Total Passed Coins - " + passedCoins.Count() + "");
+            updateLog("Total Passed Coins - " + (passedCoins.Count() + frackedCoins.Count()) + "");
             updateLog("Total Failed Coins - " + failedCoins.Count() + "");
             updateLog("Total Lost Coins - " + lostCoins.Count() + "");
             updateLog("Total Suspect Coins - " + suspectCoins.Count() + "");
 
             // Move Coins to their respective folders after sort
             FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder);
+            FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder);
 
             //FS.WriteCoin(failedCoins, FS.CounterfeitFolder, true);
             FS.MoveCoins(lostCoins, FS.DetectedFolder, FS.LostFolder);

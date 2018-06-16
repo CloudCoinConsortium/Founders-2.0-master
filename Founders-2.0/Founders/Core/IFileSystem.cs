@@ -10,9 +10,6 @@ using System.Reflection;
 using SkiaSharp;
 using QRCoder;
 
-using ZXing.Common;
-using ZXing.Rendering;
-using ZXing;
 using System.Drawing;
 
 namespace CloudCoinCore
@@ -140,7 +137,7 @@ namespace CloudCoinCore
         {
             CloudCoin coin = new CloudCoin();
 
-            IBarcodeReader reader = new BarcodeReader();
+            //IBarcodeReader reader = new BarcodeReader();
             // load a bitmap
             //var barcodeBitmap = (System.Drawing.Bitmap)Image.LoadFrom("C:\\sample-barcode-image.png");
             //// detect and decode the barcode inside the bitmap
