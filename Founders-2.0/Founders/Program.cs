@@ -15,6 +15,7 @@ using System.Drawing;
 using CloudCoinClient.CoreClasses;
 using McMaster.Extensions.CommandLineUtils;
 using ConsoleTables;
+using System.Text;
 
 namespace Founders
 {
@@ -25,9 +26,8 @@ namespace Founders
         static FileSystem FS = new FileSystem(rootFolder);
         public static RAIDA raida;
         //static List<RAIDA> networks = new List<RAIDA>();
-        public static String prompt = "> ";
+        public static String prompt = "=> ";
         public static Frack_Fixer fixer;
-        public static String[] commandsAvailable = new String[] { "Echo raida", "Show CloudCoins in Bank", "Import / Pown & Deposit", "Export / Withdraw", "Fix Fracked", "Show Folders", "Export stack files with one note each", "Help", "Quit" };
         public static int NetworkNumber = 1;
         public static SimpleLogger logger = new SimpleLogger(FS.LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
         static TrustedTradeSocket tts;
@@ -64,9 +64,10 @@ namespace Founders
             Console.WriteLine("5. Fix Fracked Coins");
             Console.WriteLine("6. Show Folders");
             Console.WriteLine("7. Help");
-            Console.WriteLine("8. Switch Network");
-            Console.WriteLine("9. Send Coins Over Trusted Trade");
-            Console.WriteLine("10. Exit");
+//            Console.WriteLine("8. Switch Network");
+            Console.WriteLine("8. Send Coins Over Trusted Trade");
+            Console.WriteLine("9. Exit");
+            Console.Write(prompt);
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
         }
@@ -134,7 +135,7 @@ namespace Founders
         {
             Setup();
            
- updateLog("Loading Network Directory");
+            updateLog("Loading Network Directory");
             SetupRAIDA();
             FS.LoadFileSystem();
             RAIDA.logger = logger;
@@ -218,7 +219,7 @@ CommandOption echo = commandLineApplication.Option(
                     {
                         int input = DisplayMenu();
                         ProcessInput(input).Wait();
-                        if (input == 10)
+                        if (input == 9)
                             break;
                     }
                     catch (Exception e)
@@ -235,7 +236,7 @@ CommandOption echo = commandLineApplication.Option(
                     if (echo.HasValue())
                     {
                         //ech();
-                        await EchoRaida();
+                        await EchoRaidas();
                     }
                     if (folders.HasValue())
                     {
@@ -356,7 +357,8 @@ CommandOption echo = commandLineApplication.Option(
                     await RAIDA.ProcessCoins(false);
                     break;
                 case 4:
-                    export();
+                    ExportCoins();
+                    //export();
                     break;
                 case 6:
                     try
@@ -376,12 +378,12 @@ CommandOption echo = commandLineApplication.Option(
                 case 7:
                     help();
                     break;
+                //case 8:
+                //    Console.Write("Enter New Network Number - ");
+                //    int nn = Convert.ToInt16(Console.ReadLine());
+                //    await SwitchNetwork(nn);
+                //    break;
                 case 8:
-                    Console.Write("Enter New Network Number - ");
-                    int nn = Convert.ToInt16(Console.ReadLine());
-                    await SwitchNetwork(nn);
-                    break;
-                case 9:
                     await SendCoinsTT();
                     break;
                 default:
@@ -432,6 +434,8 @@ CommandOption echo = commandLineApplication.Option(
             Console.Out.WriteLine("CloudCoin.HelpDesk@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
 
         }//End Help
+
+        // Echoes All the RAIDA networks and present the detailed response in a tabular format
 
         public async static Task EchoRaidas()
         {
@@ -505,6 +509,199 @@ CommandOption echo = commandLineApplication.Option(
         {
             logger.Info(logLine);
             Console.Out.WriteLine(logLine);
+        }
+
+        public static void ExportCoins()
+        {
+            Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
+            int file_type = reader.readInt(1, 5);
+
+            int exp_1 = 0;
+            int exp_5 = 0;
+            int exp_25 = 0;
+            int exp_100 = 0;
+            int exp_250 = 0;
+
+            if (onesTotalCount > 0)
+            {
+                Console.Out.WriteLine("  How many 1s do you want to export?");
+                exp_1 = reader.readInt(0, (onesTotalCount));
+            }
+
+            // if 1s not zero 
+            if (fivesTotalCount > 0)
+            {
+                Console.Out.WriteLine("  How many 5s do you want to export?");
+                exp_5 = reader.readInt(0, (fivesTotalCount));
+            }
+
+            // if 1s not zero 
+            if ((qtrTotalCount > 0))
+            {
+                Console.Out.WriteLine("  How many 25s do you want to export?");
+                exp_25 = reader.readInt(0, (qtrTotalCount));
+            }
+
+            // if 1s not zero 
+            if (hundredsTotalCount > 0)
+            {
+                Console.Out.WriteLine("  How many 100s do you want to export?");
+                exp_100 = reader.readInt(0, (hundredsTotalCount));
+            }
+
+            // if 1s not zero 
+            if (twoFiftiesTotalCount > 0)
+            {
+                Console.Out.WriteLine("  How many 250s do you want to export?");
+                exp_250 = reader.readInt(0, (twoFiftiesTotalCount));
+            }
+
+            Console.Out.WriteLine("  What tag will you add to the file name?");
+            String tag = reader.readString();
+
+            int totalSaved = exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250);
+            List<CloudCoin> totalCoins = IFileSystem.bankCoins.ToList();
+            totalCoins.AddRange(IFileSystem.frackedCoins);
+
+
+            var onesToExport = (from x in totalCoins
+                                where x.denomination == 1
+                                select x).Take(exp_1);
+            var fivesToExport = (from x in totalCoins
+                                 where x.denomination == 5
+                                 select x).Take(exp_5);
+            var qtrToExport = (from x in totalCoins
+                                 where x.denomination == 25
+                                 select x).Take(exp_25);
+            var hundredsToExport = (from x in totalCoins
+                                 where x.denomination == 100
+                                 select x).Take(exp_100);
+            var twoFiftiesToExport = (from x in totalCoins
+                                 where x.denomination == 250
+                                 select x).Take(exp_250);
+            List<CloudCoin> exportCoins = onesToExport.ToList();
+            exportCoins.AddRange(fivesToExport);
+            exportCoins.AddRange(qtrToExport);
+            exportCoins.AddRange(hundredsToExport);
+            exportCoins.AddRange(twoFiftiesToExport);
+
+            // Export Coins as jPeg Images
+            if (file_type == 1)
+            {
+                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
+                if (File.Exists(filename))
+                {
+                    // tack on a random number if a file already exists with the same tag
+                    Random rnd = new Random();
+                    int tagrand = rnd.Next(999);
+                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                }//end if file exists
+
+                foreach(var coin in exportCoins)
+                {
+                    string OutputFile = FS.ExportFolder + coin.FileName+ tag + ".jpg";
+                    bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
+                    if (fileGenerated)
+                        updateLog("CloudCoin exported as Jpeg to "+ OutputFile);
+                }
+
+                FS.RemoveCoins(exportCoins, FS.BankFolder);
+                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+            }
+
+            // Export Coins as Stack
+            if (file_type == 2)
+            {
+                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
+                if (File.Exists(filename))
+                {
+                    // tack on a random number if a file already exists with the same tag
+                    Random rnd = new Random();
+                    int tagrand = rnd.Next(999);
+                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                }//end if file exists
+
+                FS.WriteCoinsToFile(exportCoins, filename, ".stack");
+                FS.RemoveCoins(exportCoins, FS.BankFolder);
+                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+            }
+
+            // Export Coins as QR Code
+            if (file_type == 3)
+            {
+                foreach (var coin in exportCoins)
+                {
+                    string OutputFile = FS.ExportFolder + coin.FileName+".qr" + tag + ".jpg";
+                    bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
+                    if (fileGenerated)
+                        updateLog("CloudCoin Exported as QR code to " + OutputFile);
+                }
+
+                FS.RemoveCoins(exportCoins, FS.BankFolder);
+                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+            }
+
+            // Export Coins as 2D Bar code - PDF417
+            if (file_type == 4)
+            {
+                foreach (var coin in exportCoins)
+                {
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr" + tag + ".jpg";
+                    bool fileGenerated =  FS.WriteCoinToBARCode(coin, OutputFile, tag);
+                    if (fileGenerated)
+                        updateLog("CloudCoin Exported as Bar code to " + OutputFile);
+                }
+
+                FS.RemoveCoins(exportCoins, FS.BankFolder);
+                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+            }
+            if (file_type == 5)
+            {
+                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + ".csv");
+                if (File.Exists(filename))
+                {
+                    // tack on a random number if a file already exists with the same tag
+                    Random rnd = new Random();
+                    int tagrand = rnd.Next(999);
+                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+
+
+                }//end if file exists
+
+                var csv = new StringBuilder();
+                var coins = exportCoins;
+
+                var headerLine = string.Format("sn,denomination,nn,");
+                string headeranstring = "";
+                for (int i = 0; i < CloudCoinCore.Config.NodeCount; i++)
+                {
+                    headeranstring += "an" + (i + 1) + ",";
+                }
+
+                // Write the Header Record
+                csv.AppendLine(headerLine + headeranstring);
+
+                // Write the Coin Serial Numbers
+                foreach (var coin in coins)
+                {
+                    string anstring = "";
+                    for (int i = 0; i < CloudCoinCore.Config.NodeCount; i++)
+                    {
+                        anstring += coin.an[i] + ",";
+                    }
+                    var newLine = string.Format("{0},{1},{2},{3}", coin.sn, coin.denomination, coin.nn, anstring);
+                    csv.AppendLine(newLine);
+
+                }
+                File.WriteAllText(filename , csv.ToString());
+
+
+                //FS.WriteCoinsToFile(exportCoins, filename, ".s");
+                FS.RemoveCoins(exportCoins, FS.BankFolder);
+                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+            }
+
+
         }
 
         public static void export()

@@ -31,6 +31,7 @@ namespace CloudCoinCore
         public static RAIDA ActiveRAIDA;
         public static string Workspace;
         public static SimpleLogger logger;
+
         // Singleton Pattern implemented using private constructor 
         // This allows only one instance of RAIDA per application
 
@@ -59,7 +60,7 @@ namespace CloudCoinCore
         // We can now have multiple RAIDA objects each containing different networks
         // RAIDA details are read from Directory URL first.
         // In case of failure, it falls back to a file on the file system
-        public static void Instantiate()
+        public static List<RAIDA> Instantiate()
         {
             string nodesJson = "";
             networks.Clear();
@@ -109,8 +110,10 @@ namespace CloudCoinCore
                 Exception raidaException = new Exception("RAIDA instantiation failed. No Directory found on server or local path");
                 throw raidaException;
             }
-
+            return networks;
         }
+
+        // Return Main RAIDA Network populated with default Nodes Addresses(Network 1)
         public static RAIDA GetInstance()
         {
             if (MainNetwork != null)
@@ -167,8 +170,11 @@ namespace CloudCoinCore
         {                
             var networks = (from x in IFileSystem.importCoins
                             select x.nn).Distinct().ToList();
+            TimeSpan ts = new TimeSpan();
+            DateTime before = DateTime.Now;
+            DateTime after;
 
-            foreach(var nn in networks)
+            foreach (var nn in networks)
             {
                 ActiveRAIDA = (from x in RAIDA.networks
                                      where x.NetworkNumber == nn
@@ -178,6 +184,11 @@ namespace CloudCoinCore
                 await ProcessNetworkCoins(nn,ChangeANs);
                 updateLog("Coins detection for Network " + nn + "Finished.");
             }
+            after = DateTime.Now;
+            ts = after.Subtract(before);
+
+            Debug.WriteLine("Detection Completed in : " + ts.TotalMilliseconds / 1000);
+            updateLog("Detection Completed in : " + ts.TotalMilliseconds / 1000);
         }
 
 
