@@ -295,12 +295,12 @@ namespace CloudCoinCore
                 if (UP_LEFT.Success || UP_RIGHT.Success || DOWN_LEFT.Success || DOWN_RIGHT.Success || UP_LEFT_n.Success || UP_RIGHT_n.Success || DOWN_LEFT_n.Success || DOWN_RIGHT_n.Success || UP_LEFT_e.Success || UP_RIGHT_e.Success || DOWN_LEFT_e.Success || DOWN_RIGHT_e.Success || UP_LEFT_u.Success || UP_RIGHT_u.Success || DOWN_LEFT_u.Success || DOWN_RIGHT_u.Success)
                 {
                     canFix = true;
-                    Console.Out.WriteLine("isFixable");
+                    //Console.Out.WriteLine("isFixable");
                 }
                 else
                 {
                     canFix = false;
-                    Console.Out.WriteLine("Not isFixable");
+                    //Console.Out.WriteLine("Not isFixable");
                 }
 
 
@@ -316,7 +316,7 @@ namespace CloudCoinCore
             else
             {
                 canFix = false;
-                Console.Out.WriteLine("Not isFixable");
+//                Console.Out.WriteLine("Not isFixable");
             }
             pown = origPown;
             return canFix;
@@ -548,11 +548,11 @@ namespace CloudCoinCore
             if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
             {
                 returnTruth = true;
-                Console.Out.WriteLine("isGradable");
+                //Console.Out.WriteLine("isGradable");
             }
             else
             {
-                Console.Out.WriteLine("Not isGradable");
+                //Console.Out.WriteLine("Not isGradable");
             }
             return returnTruth;
         }//end is gradable pass
