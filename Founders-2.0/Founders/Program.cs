@@ -55,17 +55,18 @@ namespace Founders
 
         static public int DisplayMenu()
         {
-            Console.WriteLine("Founders Actions                  Secret Word:" + tts.secretWord);
+            Console.WriteLine("Your TA (Temporary Address): " + tts.secretWord);
+            Console.WriteLine("Give your TA to people who want to send you CloudCoins via Trusted Transfer");
             Console.WriteLine();
-            Console.WriteLine("1. Echo RAIDA");
-            Console.WriteLine("2. Show CloudCoins");
-            Console.WriteLine("3. Import CloudCoins");
-            Console.WriteLine("4. Export CloudCoins");
-            Console.WriteLine("5. Fix Fracked Coins");
-            Console.WriteLine("6. Show Folders");
-            Console.WriteLine("7. Help");
+            Console.WriteLine("1. Echo RAIDA (Check your connection to the Counterfeit Detection System)");
+            Console.WriteLine("2. Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
+            Console.WriteLine("3. Deposit (Authenticate, Pown (Password own) and Import Coins Into Your Bank Folder)");
+            Console.WriteLine("4. Withdraw (Export Coins From Your Bank Folder)");
+            Console.WriteLine("5. Synchronize Coins (Heal Coins That Some RAIDA think are Fake)");
+            Console.WriteLine("6. Show Folders (Show the location of your Bank Folder)");
+            Console.WriteLine("7. Help ( CloudCoin.HelpDesk@Protonmail.com )");
 //            Console.WriteLine("8. Switch Network");
-            Console.WriteLine("8. Send Coins Over Trusted Trade");
+            Console.WriteLine("8. Send Coins Using Trusted Third Party");
             Console.WriteLine("9. Exit");
             Console.Write(prompt);
             var result = Console.ReadLine();
@@ -133,6 +134,7 @@ namespace Founders
 
         public static void Main(params string[] args)
         {
+            Console.SetWindowSize(120, 50);
             Setup();
            
             updateLog("Loading Network Directory");
@@ -412,12 +414,12 @@ CommandOption echo = commandLineApplication.Option(
             Console.ForegroundColor = ConsoleColor.White;
             Console.Out.WriteLine("                                                                  ");
             Console.Out.WriteLine("                   CloudCoin Founders Edition                     ");
-            Console.Out.WriteLine("                      Version: October.10.2017                    ");
+            Console.Out.WriteLine("                      Version: June.19.2018                       ");
             Console.Out.WriteLine("          Used to Authenticate, Store and Payout CloudCoins       ");
             Console.Out.WriteLine("      This Software is provided as is with all faults, defects    ");
             Console.Out.WriteLine("          and errors, and without warranty of any kind.           ");
             Console.Out.WriteLine("                Free from the CloudCoin Consortium.               ");
-            Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
+            //Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
             Console.Out.WriteLine("                                                                  ");
 
             Console.ForegroundColor = ConsoleColor.White;
