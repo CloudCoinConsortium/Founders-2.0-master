@@ -598,10 +598,65 @@ CommandOption echo = commandLineApplication.Option(
             Console.Out.WriteLine(logLine);
         }
 
+        public static void CalculateTotals()
+        {
+            var bankCoins = FS.LoadFolderCoins(FS.BankFolder);
+
+
+            onesCount = (from x in bankCoins
+                         where x.denomination == 1
+                         select x).Count();
+            fivesCount = (from x in bankCoins
+                          where x.denomination == 5
+                          select x).Count();
+            qtrCount = (from x in bankCoins
+                        where x.denomination == 25
+                        select x).Count();
+            hundredsCount = (from x in bankCoins
+                             where x.denomination == 100
+                             select x).Count();
+            twoFiftiesCount = (from x in bankCoins
+                               where x.denomination == 250
+                               select x).Count();
+
+            var frackedCoins = FS.LoadFolderCoins(FS.FrackedFolder);
+            bankCoins.AddRange(frackedCoins);
+
+            onesFrackedCount = (from x in frackedCoins
+                                where x.denomination == 1
+                                select x).Count();
+            fivesFrackedCount = (from x in frackedCoins
+                                 where x.denomination == 5
+                                 select x).Count();
+            qtrFrackedCount = (from x in frackedCoins
+                               where x.denomination == 25
+                               select x).Count();
+            hundredsFrackedCount = (from x in frackedCoins
+                                    where x.denomination == 100
+                                    select x).Count();
+            twoFrackedFiftiesCount = (from x in frackedCoins
+                                      where x.denomination == 250
+                                      select x).Count();
+
+            onesTotalCount = onesCount + onesFrackedCount;
+            fivesTotalCount = fivesCount + fivesFrackedCount;
+            qtrTotalCount = qtrCount + qtrFrackedCount;
+            hundredsTotalCount = hundredsCount + hundredsFrackedCount;
+            twoFiftiesTotalCount = twoFiftiesCount + twoFrackedFiftiesCount;
+
+        }
         public static void ExportCoins()
         {
+            FS.LoadFileSystem();
+            CalculateTotals();
             Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
             int file_type = reader.readInt(1, 5);
+            int stack_type = 1;
+            if(file_type== 2)
+            {
+                Console.WriteLine("Export All Coins to Single Stack (1) or One Stack per coin (2)?");
+                stack_type = reader.readInt(1, 2);
+            }
 
             int exp_1 = 0;
             int exp_5 = 0;
@@ -699,18 +754,35 @@ CommandOption echo = commandLineApplication.Option(
             // Export Coins as Stack
             if (file_type == 2)
             {
-                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
-                if (File.Exists(filename))
+                if (stack_type == 1)
                 {
-                    // tack on a random number if a file already exists with the same tag
-                    Random rnd = new Random();
-                    int tagrand = rnd.Next(999);
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
-                }//end if file exists
+                    String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
+                    if (File.Exists(filename))
+                    {
+                        // tack on a random number if a file already exists with the same tag
+                        Random rnd = new Random();
+                        int tagrand = rnd.Next(999);
+                        filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                    }//end if file exists
 
-                FS.WriteCoinsToFile(exportCoins, filename, ".stack");
-                FS.RemoveCoins(exportCoins, FS.BankFolder);
-                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                    FS.WriteCoinsToFile(exportCoins, filename, ".stack");
+                    FS.RemoveCoins(exportCoins, FS.BankFolder);
+                    FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                }
+                else
+                {
+                    foreach (var coin in exportCoins)
+                    {
+                        string OutputFile = FS.ExportFolder + coin.FileName + tag + ".stack";
+                        FS.WriteCoinToFile(coin, OutputFile);
+
+                        FS.RemoveCoins(exportCoins, FS.BankFolder);
+                        FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+
+                        updateLog("CloudCoin exported as Stack to " + OutputFile);
+                    }
+
+                }
             }
 
             // Export Coins as QR Code
