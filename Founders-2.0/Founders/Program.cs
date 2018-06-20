@@ -64,10 +64,12 @@ namespace Founders
             Console.WriteLine("4. Withdraw (Export Coins From Your Bank Folder)");
             Console.WriteLine("5. Synchronize Coins (Heal Coins That Some RAIDA think are Fake)");
             Console.WriteLine("6. Show Folders (Show the location of your Bank Folder)");
-            Console.WriteLine("7. Help ( CloudCoin.HelpDesk@Protonmail.com )");
+            Console.WriteLine("7. Backup");
+            Console.WriteLine("8. List Coin Serials");
+            Console.WriteLine("9. Help ( CloudCoin.HelpDesk@Protonmail.com )");
 //            Console.WriteLine("8. Switch Network");
-            Console.WriteLine("8. Send Coins Using Trusted Third Party");
-            Console.WriteLine("9. Exit");
+            Console.WriteLine("10. Send Coins Using Trusted Third Party");
+            Console.WriteLine("11. Exit");
             Console.Write(prompt);
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
@@ -134,7 +136,8 @@ namespace Founders
 
         public static void Main(params string[] args)
         {
-            Console.SetWindowSize(120, 50);
+            
+            //Console.SetWindowSize(120, 50);
             Setup();
            
             updateLog("Loading Network Directory");
@@ -378,18 +381,100 @@ CommandOption echo = commandLineApplication.Option(
                     //fix(timeout);
                     break;
                 case 7:
+                    Backup();
+                    break;
+                case 8:
+                    ListSerials();
+                    break;
+                case 9:
                     help();
                     break;
-                //case 8:
-                //    Console.Write("Enter New Network Number - ");
-                //    int nn = Convert.ToInt16(Console.ReadLine());
-                //    await SwitchNetwork(nn);
-                //    break;
-                case 8:
+                case 10:
                     await SendCoinsTT();
+                    break;
+                case 11:
                     break;
                 default:
                     break;
+            }
+        }
+
+        public static void ListSerials()
+        {
+            Console.Write("Enter Source Location: ");
+            string sourceLocation = reader.readString();
+            if(!Directory.Exists(sourceLocation))
+            {
+                Console.WriteLine("Folder does not exist.");
+                return;
+            }
+            Console.Write("Enter Target Folder Location: ");
+            string targetLocation = reader.readString();
+            if (!Directory.Exists(targetLocation))
+            {
+                Console.WriteLine("Folder does not exist.");
+                return;
+            }
+
+            ListSerials(sourceLocation, targetLocation);
+
+        }
+        public static void ListSerials(string SourceLocation,string TargetLocation)
+        {
+            var folderCoins = FS.LoadFolderCoins(SourceLocation);
+
+            var csv = new StringBuilder();
+            var coins = folderCoins;
+
+            var headerLine = string.Format("sn,denomination,nn,");
+            string headeranstring = "";
+            for (int i = 0; i < CloudCoinCore.Config.NodeCount; i++)
+            {
+                headeranstring += "an" + (i + 1) + ",";
+            }
+
+            // Write the Header Record
+            csv.AppendLine(headerLine + headeranstring);
+
+            // Write the Coin Serial Numbers
+            foreach (var coin in coins)
+            {
+                string anstring = "";
+                for (int i = 0; i < CloudCoinCore.Config.NodeCount; i++)
+                {
+                    anstring += coin.an[i] + ",";
+                }
+                var newLine = string.Format("{0},{1},{2},{3}", coin.sn, coin.denomination, coin.nn, anstring);
+                csv.AppendLine(newLine);
+
+            }
+            string filename = TargetLocation +Path.DirectorySeparatorChar + "CoinSerials"+ DateTime.Now.ToString("yyyyMMddhhmmss").ToLower() + ".csv";
+            File.WriteAllText(filename, csv.ToString());
+        }
+        public static void Backup()
+        {
+            Console.Write("Enter Backup Location: ");
+            string backupLocation = reader.readString();
+            Backup(backupLocation);
+        }
+        public static void Backup(string TargetLocation)
+        {
+            if (Directory.Exists(TargetLocation))
+            {
+                var bankCoins = FS.LoadFolderCoins(FS.BankFolder);
+                bankCoins.AddRange(FS.LoadFolderCoins(FS.FrackedFolder));
+                if (bankCoins.Count() == 0)
+                {
+                    updateLog("No Coins available for backup.");
+                    return;
+                }
+                string FileName = TargetLocation + Path.DirectorySeparatorChar+  "CloudCoinsBackup" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower();
+                FS.WriteCoinsToFile(bankCoins, FileName, ".stack");
+                Console.WriteLine("CloudCoins Backup successful");
+            }
+            else
+            {
+                Console.WriteLine("The target location does not exist.");
             }
         }
         private static void ech()

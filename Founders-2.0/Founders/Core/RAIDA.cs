@@ -179,10 +179,15 @@ namespace CloudCoinCore
                 ActiveRAIDA = (from x in RAIDA.networks
                                      where x.NetworkNumber == nn
                                      select x).FirstOrDefault();
-
-                updateLog("Starting Coins detection for Network " + nn);
-                await ProcessNetworkCoins(nn,ChangeANs);
-                updateLog("Coins detection for Network " + nn + "Finished.");
+                int NetworkExists = (from x in RAIDA.networks
+                 where x.NetworkNumber == nn
+                 select x).Count();
+                if (NetworkExists > 0)
+                {
+                    updateLog("Starting Coins detection for Network " + nn);
+                    await ProcessNetworkCoins(nn, ChangeANs);
+                    updateLog("Coins detection for Network " + nn + "Finished.");
+                }
             }
             after = DateTime.Now;
             ts = after.Subtract(before);
@@ -209,7 +214,8 @@ namespace CloudCoinCore
             RAIDA raida = (from x in networks
                            where x.NetworkNumber == NetworkNumber
                            select x).FirstOrDefault();
-
+            if (raida == null)
+                return;
             // Process Coins in Lots of 200. Can be changed from Config File
             int LotCount = predetectCoins.Count() / Config.MultiDetectLoad;
             if (predetectCoins.Count() % Config.MultiDetectLoad > 0) LotCount++;
@@ -221,8 +227,14 @@ namespace CloudCoinCore
             {
                 //Pick up 200 Coins and send them to RAIDA
                 var coins = predetectCoins.Skip(i * Config.MultiDetectLoad).Take(200);
-                raida.coins = coins;
-
+                try
+                {
+                    raida.coins = coins;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
                 var tasks = raida.GetMultiDetectTasks(coins.ToArray(), Config.milliSecondsToTimeOut,ChangeANS);
                 try
                 {
