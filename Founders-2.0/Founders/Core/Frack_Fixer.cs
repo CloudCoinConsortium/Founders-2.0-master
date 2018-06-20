@@ -304,7 +304,7 @@ namespace CloudCoinCore
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Out.WriteLine("");
-                    Console.WriteLine("Attempting to fix RAIDA " + raida_ID);
+                    Console.Write("Attempting to fix RAIDA " + raida_ID);
                     pge.MajorProgressMessage = "Attempting to fix RAIDA " + raida_ID;
                     raida.OnLogRecieved(pge);
                     // CoreLogger.Log("Attempting to fix RAIDA " + raida_ID);
@@ -322,7 +322,8 @@ namespace CloudCoinCore
                             Debug.Write("Stopping Execution");
                             return cu;
                         }
-                        Console.WriteLine(" Using corner " + corner);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(" Using corner " + corner + " Pown is "+ brokeCoin.pown);
                         pge.MajorProgressMessage = " Using corner " + corner;
                         raida.OnLogRecieved(pge);
                         //   CoreLogger.Log(" Using corner " + corner);
