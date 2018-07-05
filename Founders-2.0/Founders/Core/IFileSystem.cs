@@ -69,9 +69,10 @@ namespace CloudCoinCore
 
             if (format == Formats.BarCode)
             {
+                string[] allowedExtensions = { "jpg"};
                 var files = Directory
                .GetFiles(folder)
-               .Where(file => Config.allowedExtensions.Any(file.ToLower().EndsWith))
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
                .ToList();
 
                 string[] fnames = new string[files.Count()];
@@ -82,8 +83,61 @@ namespace CloudCoinCore
 
                     try
                     {
-                        var coin = readQRCode(files[i]);
+                        var coin = ReadBARCode(files[i]);
                         folderCoins.Add(coin);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+
+            if (format == Formats.QRCode)
+            {
+                string[] allowedExtensions = { "jpg" };
+
+                var files = Directory
+               .GetFiles(folder)
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
+               .ToList();
+
+                string[] fnames = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    fnames[i] = Path.GetFileName(files.ElementAt(i));
+                    string ext = Path.GetExtension(files.ElementAt(i));
+
+                    try
+                    {
+                        var coin = ReadQRCode(files[i]);
+                        folderCoins.Add(coin);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+            if (format == Formats.CSV)
+            {
+                string[] allowedExtensions = { "csv" };
+
+                var files = Directory
+               .GetFiles(folder)
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
+               .ToList();
+
+                string[] fnames = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    fnames[i] = Path.GetFileName(files.ElementAt(i));
+                    string ext = Path.GetExtension(files.ElementAt(i));
+
+                    try
+                    {
+                        var coin = ReadCSVCoins(files[i]);
+                        folderCoins.AddRange(coin);
                     }
                     catch (Exception e)
                     {
@@ -94,7 +148,14 @@ namespace CloudCoinCore
             return folderCoins;
         }
 
-            public List<CloudCoin> LoadFolderCoins(string folder)
+        public List<CloudCoin> LoadFolderBarCodes(string folder)
+        {
+            List<CloudCoin> folderCoins = new List<CloudCoin>();
+
+            return folderCoins;
+        }
+
+        public List<CloudCoin> LoadFolderCoins(string folder)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
 
@@ -133,24 +194,35 @@ namespace CloudCoinCore
             return folderCoins;
         }
 
-        private CloudCoin readQRCode(String fileName)//Move one jpeg to suspect folder. 
+        private CloudCoin ReadQRCode(String fileName)//Read a CloudCoin from QR Code 
         {
             CloudCoin coin = new CloudCoin();
 
-            //IBarcodeReader reader = new BarcodeReader();
-            // load a bitmap
-            //var barcodeBitmap = (System.Drawing.Bitmap)Image.LoadFrom("C:\\sample-barcode-image.png");
-            //// detect and decode the barcode inside the bitmap
-            //var result = reader.Decode(barcodeBitmap);
-            //// do something with the result
-            //if (result != null)
-            //{
-                
-            //}
+            return coin;
+        }
+
+        private CloudCoin ReadBARCode(String fileName)//Read a CloudCoin from BAR Code . 
+        {
+            CloudCoin coin = new CloudCoin();
 
             return coin;
         }
-            private CloudCoin importJPEG(String fileName)//Move one jpeg to suspect folder. 
+
+        private List<CloudCoin> ReadCSVCoins(String fileName)//Read a CloudCoin from CSV . 
+        {
+            List<CloudCoin> cloudCoins = new List<CloudCoin>();
+            var lines = File.ReadAllLines(fileName);
+            //var lines = File.ReadAllLines(fileName).Select(a => a.Split(','));
+
+            CloudCoin coin = new CloudCoin();
+            
+            foreach(var line in lines)
+            {
+               cloudCoins.Add( CloudCoin.FromCSV(line));
+            }
+            return cloudCoins;
+        }
+        private CloudCoin importJPEG(String fileName)//Move one jpeg to suspect folder. 
         {
             // bool isSuccessful = false;
             // Console.Out.WriteLine("Trying to load: " + this.fileUtils.importFolder + fileName );

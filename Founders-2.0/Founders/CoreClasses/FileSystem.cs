@@ -111,6 +111,16 @@ namespace CloudCoinClient.CoreClasses
         public override void LoadFileSystem()
         {
             importCoins = LoadFolderCoins(ImportFolder);
+            var csvCoins = LoadCoinsByFormat(ImportFolder +Path.DirectorySeparatorChar + "CSV", Formats.CSV);
+            var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
+            var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
+
+            // Add Additional File formats if present
+            importCoins.ToList().AddRange(csvCoins);
+            importCoins.ToList().AddRange(BarCodeCoins);
+            importCoins.ToList().AddRange(qrCoins);
+
+
             //exportCoins = LoadFolderCoins(ExportFolder);
             bankCoins = LoadFolderCoins(BankFolder);
             lostCoins = LoadFolderCoins(LostFolder);

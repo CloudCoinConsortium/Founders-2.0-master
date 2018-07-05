@@ -498,7 +498,7 @@ CommandOption echo = commandLineApplication.Option(
             Console.ForegroundColor = ConsoleColor.White;
             Console.Out.WriteLine("                                                                  ");
             Console.Out.WriteLine("                   CloudCoin Founders Edition                     ");
-            Console.Out.WriteLine("                      Version: June.19.2018                       ");
+            Console.Out.WriteLine("                      Version: July.05.2018                       ");
             Console.Out.WriteLine("          Used to Authenticate, Store and Payout CloudCoins       ");
             Console.Out.WriteLine("      This Software is provided as is with all faults, defects    ");
             Console.Out.WriteLine("          and errors, and without warranty of any kind.           ");
