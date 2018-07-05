@@ -137,6 +137,7 @@ namespace CloudCoinCore
                     try
                     {
                         var coin = ReadCSVCoins(files[i]);
+                        coin.RemoveAll(item => item == null);
                         folderCoins.AddRange(coin);
                     }
                     catch (Exception e)
@@ -188,6 +189,20 @@ namespace CloudCoinCore
                     {
 
                     }
+                }
+                if( ext == ".csv")
+                {
+                    var lines = File.ReadAllLines(files[i]);
+                    //var lines = File.ReadAllLines(fileName).Select(a => a.Split(','));
+                    List<CloudCoin> CsvCoins = new List<CloudCoin>();
+                    
+
+                    foreach (var line in lines)
+                    {
+                        CsvCoins.Add(CloudCoin.FromCSV(line));
+                    }
+                    CsvCoins.RemoveAll(item => item == null);
+                    folderCoins.AddRange(CsvCoins);
                 }
             };
 

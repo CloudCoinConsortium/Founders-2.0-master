@@ -116,10 +116,11 @@ namespace CloudCoinClient.CoreClasses
             var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
 
             // Add Additional File formats if present
-            importCoins.ToList().AddRange(csvCoins);
-            importCoins.ToList().AddRange(BarCodeCoins);
-            importCoins.ToList().AddRange(qrCoins);
-
+            //importCoins = importCoins.Concat(csvCoins);
+            importCoins =  importCoins.Concat(BarCodeCoins);
+            importCoins = importCoins.Concat(qrCoins);
+            
+            Debug.WriteLine("Count -" + importCoins.Count());
 
             //exportCoins = LoadFolderCoins(ExportFolder);
             bankCoins = LoadFolderCoins(BankFolder);
