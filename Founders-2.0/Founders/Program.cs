@@ -55,8 +55,8 @@ namespace Founders
 
         static public int DisplayMenu()
         {
-            Console.WriteLine("Your TA (Temporary Address): " + tts.secretWord);
-            Console.WriteLine("Give your TA to people who want to send you CloudCoins via Trusted Transfer");
+            //Console.WriteLine("Your TA (Temporary Address): " + tts.secretWord);
+            //Console.WriteLine("Give your TA to people who want to send you CloudCoins via Trusted Transfer");
             Console.WriteLine();
             Console.WriteLine("1. Echo RAIDA (Check your connection to the Counterfeit Detection System)");
             Console.WriteLine("2. Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
@@ -68,8 +68,8 @@ namespace Founders
             Console.WriteLine("8. List Coin Serials");
             Console.WriteLine("9. Help ( CloudCoin.HelpDesk@Protonmail.com )");
 //            Console.WriteLine("8. Switch Network");
-            Console.WriteLine("10. Send Coins Using Trusted Third Party");
-            Console.WriteLine("11. Exit");
+      //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
+            Console.WriteLine("10. Exit");
             Console.Write(prompt);
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
@@ -224,7 +224,7 @@ CommandOption echo = commandLineApplication.Option(
                     {
                         int input = DisplayMenu();
                         ProcessInput(input).Wait();
-                        if (input == 9)
+                        if (input == 10)
                             break;
                     }
                     catch (Exception e)
@@ -390,7 +390,6 @@ CommandOption echo = commandLineApplication.Option(
                     help();
                     break;
                 case 10:
-                    await SendCoinsTT();
                     break;
                 case 11:
                     break;
@@ -997,8 +996,8 @@ CommandOption echo = commandLineApplication.Option(
             FS.LoadFileSystem();
 
             //Connect to Trusted Trade Socket
-            tts = new TrustedTradeSocket("wss://escrow.cloudcoin.digital/ws/", 10, OnWord, OnStatusChange, OnReceive, OnProgress);
-            tts.Connect().Wait();
+           // tts = new TrustedTradeSocket("wss://escrow.cloudcoin.digital/ws/", 10, OnWord, OnStatusChange, OnReceive, OnProgress);
+           // tts.Connect().Wait();
             //Load Local Coins
 
             //  Console.Read();
