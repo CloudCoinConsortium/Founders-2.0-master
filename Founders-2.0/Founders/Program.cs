@@ -359,7 +359,7 @@ CommandOption echo = commandLineApplication.Option(
                 case 3:
                     //await detect();
                     FS.LoadFileSystem();
-                    await RAIDA.ProcessCoins(false);
+                    await RAIDA.ProcessCoins(true);
                     break;
                 case 4:
                     ExportCoins();
