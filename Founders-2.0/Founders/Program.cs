@@ -804,7 +804,7 @@ CommandOption echo = commandLineApplication.Option(
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode" + tag + ".jpg";
                     bool fileGenerated =  FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
                         updateLog("CloudCoin Exported as Bar code to " + OutputFile);
