@@ -143,7 +143,7 @@ namespace CloudCoinClient.CoreClasses
         {
             foreach (var coin in importCoins)
             {
-                string fileName = getCelebriumName(coin.FileName);
+                string fileName = GetCoinName(coin.FileName);
                 int coinExists = (from x in predetectCoins
                                   where x.sn == coin.sn
                                   select x).Count();
@@ -183,7 +183,7 @@ namespace CloudCoinClient.CoreClasses
             }
         }
 
-        public string getCelebriumName(string CoinName)
+        public string GetCoinName(string CoinName)
         {
             return CoinName;
         }
@@ -193,7 +193,7 @@ namespace CloudCoinClient.CoreClasses
 
             foreach (var coin in coins)
             {
-                string fileName = getCelebriumName(coin.FileName);
+                string fileName = GetCoinName(coin.FileName);
                 try
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -205,7 +205,7 @@ namespace CloudCoinClient.CoreClasses
                     {
                         serializer.Serialize(writer, stack);
                     }
-                    File.Delete(sourceFolder + getCelebriumName(coin.FileName) + extension);
+                    File.Delete(sourceFolder + GetCoinName(coin.FileName) + extension);
                 }
                 catch (Exception e)
                 {
@@ -276,6 +276,28 @@ namespace CloudCoinClient.CoreClasses
             for (int i = 0; i < files.Count(); i++)
             {
                 MoveFile(files[i], ImportedFolder + Path.DirectorySeparatorChar + Path.GetFileName(files[i]), FileMoveOptions.Rename);
+            }
+
+            var filesqr = Directory
+              .GetFiles(ImportFolder + Path.DirectorySeparatorChar + "QrCodes")
+              .Where(file => CloudCoinCore.Config.allowedExtensions.Any(file.ToLower().EndsWith))
+              .ToList();
+
+            string[] fnamesqr = new string[filesqr.Count()];
+            for (int i = 0; i < filesqr.Count(); i++)
+            {
+                MoveFile(filesqr[i], ImportedFolder + Path.DirectorySeparatorChar + Path.GetFileName(filesqr[i]), FileMoveOptions.Rename);
+            }
+
+            var filesbar = Directory
+              .GetFiles(ImportFolder + Path.DirectorySeparatorChar + "Barcodes")
+              .Where(file => CloudCoinCore.Config.allowedExtensions.Any(file.ToLower().EndsWith))
+              .ToList();
+
+            string[] fnamesbar = new string[filesbar.Count()];
+            for (int i = 0; i < filesbar.Count(); i++)
+            {
+                MoveFile(filesbar[i], ImportedFolder + Path.DirectorySeparatorChar + Path.GetFileName(filesbar[i]), FileMoveOptions.Rename);
             }
         }
 

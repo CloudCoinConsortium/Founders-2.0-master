@@ -11,6 +11,7 @@ using SkiaSharp;
 using QRCoder;
 
 using System.Drawing;
+using ZXing;
 
 namespace CloudCoinCore
 {
@@ -213,14 +214,41 @@ namespace CloudCoinCore
         {
             CloudCoin coin = new CloudCoin();
 
-            return coin;
+            try
+            {
+                Bitmap bitmap = new Bitmap(fileName);
+                BarcodeReader reader = new BarcodeReader { AutoRotate = true, TryInverted = true };
+                Result result = reader.Decode(bitmap);
+                string decoded = result.ToString().Trim();
+
+                CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+                return cloudCoin;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private CloudCoin ReadBARCode(String fileName)//Read a CloudCoin from BAR Code . 
         {
             CloudCoin coin = new CloudCoin();
 
-            return coin;
+            try
+            {
+                var barcodeReader = new BarcodeReader();
+                Bitmap bitmap = new Bitmap(fileName);
+               
+                var barcodeResult = barcodeReader.Decode(bitmap);
+                string decoded = barcodeResult.ToString().Trim();
+
+                CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+                return cloudCoin;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private List<CloudCoin> ReadCSVCoins(String fileName)//Read a CloudCoin from CSV . 

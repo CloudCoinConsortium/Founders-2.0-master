@@ -88,6 +88,20 @@ namespace CloudCoinCore
         {
 
         }//end of constructor
+
+        public static CloudCoin FromJson(string csvLine)
+        {
+            try
+            {
+
+            }
+            catch(Exception e)
+            {
+
+            }
+            return null;
+
+        }
         public static CloudCoin FromCSV(string csvLine)
         {
             try
