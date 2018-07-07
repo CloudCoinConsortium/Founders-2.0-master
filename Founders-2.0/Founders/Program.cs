@@ -143,10 +143,11 @@ namespace Founders
             updateLog("Loading Network Directory");
             SetupRAIDA();
             FS.LoadFileSystem();
+            
             RAIDA.logger = logger;
             fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
-
-            Console.Clear();
+            EchoRaida().Wait();
+            //Console.Clear();
             // Program.exe <-g|--greeting|-$ <greeting>> [name <fullname>]
             // [-?|-h|--help] [-u|--uppercase]
             #region CommandLineArguments
@@ -339,9 +340,14 @@ CommandOption echo = commandLineApplication.Option(
             Console.Out.WriteLine("                                                                    ");
             Console.Out.WriteLine("                 1s         5s         25s       100s       250s    ");
             Console.Out.WriteLine("                                                                    ");
-            Console.Out.WriteLine("   Perfect:   " + string.Format("{0,7}", onesCount) + "    " + string.Format("{0,7}", fivesCount) + "    " + string.Format("{0,7}", qtrCount) + "    " + string.Format("{0,7}", hundredsCount) + "    " + string.Format("{0,7}", twoFiftiesCount) + "   ");
+            Console.Out.WriteLine("   Perfect:   " + string.Format("{0,7}", onesCount) + "    " + 
+                string.Format("{0,7}", fivesCount) + "    " + string.Format("{0,7}", qtrCount) + "    " + 
+                string.Format("{0,7}", hundredsCount) + "    " + string.Format("{0,7}", twoFiftiesCount) + "   ");
             Console.Out.WriteLine("                                                                    ");
-            Console.Out.WriteLine("   Fracked:   " + string.Format("{0,7}", onesFrackedCount) + "    " + string.Format("{0,7}", fivesFrackedCount) + "    " + string.Format("{0,7}", qtrFrackedCount) + "    " + string.Format("{0,7}", hundredsFrackedCount) + "    " + string.Format("{0,7}", twoFrackedFiftiesCount) + "   ");
+            Console.Out.WriteLine("   Fracked:   " + string.Format("{0,7}", onesFrackedCount) + "    " + 
+                string.Format("{0,7}", fivesFrackedCount) + "    " + string.Format("{0,7}", qtrFrackedCount) + 
+                "    " + string.Format("{0,7}", hundredsFrackedCount) + "    " + string.Format("{0,7}", 
+                twoFrackedFiftiesCount) + "   ");
             Console.Out.WriteLine("                                                                    ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
@@ -529,6 +535,8 @@ CommandOption echo = commandLineApplication.Option(
                             select x).Distinct().ToList();
             foreach (var network in networks)
             {
+                if(network.NetworkNumber == 1)
+                {
                 Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", network.NetworkNumber));
                 Console.Out.WriteLine("----------------------------------\n");
                 var echos = network.GetEchoTasks();
@@ -555,6 +563,8 @@ CommandOption echo = commandLineApplication.Option(
                     Console.WriteLine(e.Message);
                 }
                 Console.Out.WriteLine("-----------------------------------\n");
+
+                }
 
 
             }
@@ -743,7 +753,10 @@ CommandOption echo = commandLineApplication.Option(
                     string OutputFile = FS.ExportFolder + coin.FileName+ tag + ".jpg";
                     bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
                     if (fileGenerated)
-                        updateLog("CloudCoin exported as Jpeg to "+ OutputFile);
+                    {
+                        updateLog("CloudCoin exported as Jpeg to " + OutputFile);
+                        Console.WriteLine("CloudCoin exported as Jpeg to " + OutputFile);
+                    }
                 }
 
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
@@ -765,6 +778,7 @@ CommandOption echo = commandLineApplication.Option(
                     }//end if file exists
 
                     FS.WriteCoinsToFile(exportCoins, filename, ".stack");
+                    Console.WriteLine("Coins exported as stack file to " + filename);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
                 }
@@ -777,7 +791,7 @@ CommandOption echo = commandLineApplication.Option(
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
                         FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-
+                        Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
                     }
 
@@ -792,7 +806,10 @@ CommandOption echo = commandLineApplication.Option(
                     string OutputFile = FS.ExportFolder + coin.FileName+".qr" + tag + ".jpg";
                     bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
                     if (fileGenerated)
+                    {
                         updateLog("CloudCoin Exported as QR code to " + OutputFile);
+                        Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
+                    }
                 }
 
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
@@ -807,7 +824,10 @@ CommandOption echo = commandLineApplication.Option(
                     string OutputFile = FS.ExportFolder + coin.FileName + ".barcode" + tag + ".jpg";
                     bool fileGenerated =  FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
+                    {
                         updateLog("CloudCoin Exported as Bar code to " + OutputFile);
+                        Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
+                    }
                 }
 
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
@@ -852,8 +872,8 @@ CommandOption echo = commandLineApplication.Option(
 
                 }
                 File.WriteAllText(filename , csv.ToString());
-
-
+                updateLog("Coins exported to "+ filename);
+                Console.WriteLine("Coins exported as csv to " + filename);
                 //FS.WriteCoinsToFile(exportCoins, filename, ".s");
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
                 FS.RemoveCoins(exportCoins, FS.FrackedFolder);
