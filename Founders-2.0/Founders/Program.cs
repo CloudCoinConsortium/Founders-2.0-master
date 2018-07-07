@@ -140,16 +140,7 @@ namespace Founders
             //Console.SetWindowSize(120, 50);
             Setup();
            
-            updateLog("Loading Network Directory");
-            SetupRAIDA();
-            FS.LoadFileSystem();
-            
-            RAIDA.logger = logger;
-            fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
-            EchoRaida().Wait();
-            //Console.Clear();
-            // Program.exe <-g|--greeting|-$ <greeting>> [name <fullname>]
-            // [-?|-h|--help] [-u|--uppercase]
+
             #region CommandLineArguments
             CommandLineApplication commandLineApplication =
               new CommandLineApplication(throwOnUnexpectedArg: false);
@@ -188,6 +179,12 @@ CommandOption echo = commandLineApplication.Option(
             "Shows details of your coins in bank.",
             CommandOptionType.NoValue);
 
+            CommandOption list = commandLineApplication.Option(
+                "-$|-l |--list ",
+                "List Coins in a folder.",
+                CommandOptionType.NoValue);
+
+
             CommandOption backup = commandLineApplication.Option(
             "-$|-ba |--backup ",
             "Backup your coins to specified folder.",
@@ -214,10 +211,23 @@ CommandOption echo = commandLineApplication.Option(
               "The command to pown/detect/import your CloudCoins.",
                 CommandOptionType.NoValue);
 
+            CommandOption export = commandLineApplication.Option(
+  "-$|-ex |--export ",
+  "The command to export your CloudCoins.",
+    CommandOptionType.NoValue);
+
             #endregion
 
             if (args.Length < 1)
             {
+                updateLog("Loading Network Directory");
+                SetupRAIDA();
+                FS.LoadFileSystem();
+
+                RAIDA.logger = logger;
+                fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
+
+                EchoRaida().Wait();
                 printWelcome();
                 while (true)
                 {
@@ -239,6 +249,15 @@ CommandOption echo = commandLineApplication.Option(
 
                 commandLineApplication.OnExecute(async () =>
                 {
+                    if(echo.HasValue() || pown.HasValue() || detection.HasValue() || import.HasValue() || stats.HasValue() )
+                    {
+                        updateLog("Loading Network Directory");
+                        SetupRAIDA();
+                        FS.LoadFileSystem();
+
+                        RAIDA.logger = logger;
+                        fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
+                    }
                     if (echo.HasValue())
                     {
                         //ech();
@@ -246,6 +265,7 @@ CommandOption echo = commandLineApplication.Option(
                     }
                     if (folders.HasValue())
                     {
+                        FS.LoadFileSystem();
                         ShowFolders();
                     }
 
@@ -259,7 +279,7 @@ CommandOption echo = commandLineApplication.Option(
                     }
                     if(stats.HasValue())
                     {
-                        await EchoRaidas();
+                        await EchoRaidas(true);
                     }
                     if (total.HasValue())
                     {
@@ -267,7 +287,20 @@ CommandOption echo = commandLineApplication.Option(
                     }
                     if (backup.HasValue())
                     {
-                        Console.WriteLine(backup.Value());
+                        FS.LoadFileSystem();
+                        Backup(backup.Value());
+                       // Console.WriteLine(backup.Value());
+                    }
+                    if(list.HasValue())
+                    {
+                        FS.LoadFileSystem();
+                        ListSerials();
+                    }
+                    if (export.HasValue())
+                    {
+                        FS.LoadFileSystem();
+                        showCoins();
+                        ExportCoins();
                     }
                     return 0;
                 });
@@ -529,14 +562,16 @@ CommandOption echo = commandLineApplication.Option(
 
         // Echoes All the RAIDA networks and present the detailed response in a tabular format
 
-        public async static Task EchoRaidas()
+        public async static Task EchoRaidas(bool scanAll = false)
         {
             var networks = (from x in RAIDA.networks
                             select x).Distinct().ToList();
             foreach (var network in networks)
             {
-                if(network.NetworkNumber == 1)
+                if(network.NetworkNumber != 1 && scanAll == false)
                 {
+                    break;
+                }
                 Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", network.NetworkNumber));
                 Console.Out.WriteLine("----------------------------------\n");
                 var echos = network.GetEchoTasks();
@@ -563,10 +598,6 @@ CommandOption echo = commandLineApplication.Option(
                     Console.WriteLine(e.Message);
                 }
                 Console.Out.WriteLine("-----------------------------------\n");
-
-                }
-
-
             }
 
             Console.WriteLine();
