@@ -659,7 +659,7 @@ namespace CloudCoinCore
             }
         }
 
-        public void WriteCoin(IEnumerable<CloudCoin> coins, string folder, bool writeAll = false)
+        public void WriteCoin(IEnumerable<CloudCoin> coins, string folder,bool replaceExisting =true, bool writeAll = false)
         {
             if (writeAll)
             {
@@ -683,7 +683,7 @@ namespace CloudCoinCore
                 int coinExists = (from x in folderCoins
                                   where x.sn == coin.sn
                                   select x).Count();
-                if (coinExists > 0)
+                if (coinExists > 0 && replaceExisting)
                 {
                     string suffix = Utils.RandomString(16);
                     fileName += suffix.ToLower();

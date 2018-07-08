@@ -10,11 +10,8 @@ using System.Reflection;
 using SkiaSharp;
 using QRCoder;
 
-using ZXing.Common;
-using ZXing.Rendering;
-using ZXing;
-using Pdf417;
 using System.Drawing;
+using ZXing;
 
 namespace CloudCoinCore
 {
@@ -73,9 +70,10 @@ namespace CloudCoinCore
 
             if (format == Formats.BarCode)
             {
+                string[] allowedExtensions = { "jpg" };
                 var files = Directory
                .GetFiles(folder)
-               .Where(file => Config.allowedExtensions.Any(file.ToLower().EndsWith))
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
                .ToList();
 
                 string[] fnames = new string[files.Count()];
@@ -86,8 +84,62 @@ namespace CloudCoinCore
 
                     try
                     {
-                        var coin = readQRCode(files[i]);
+                        var coin = ReadBARCode(files[i]);
                         folderCoins.Add(coin);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+
+            if (format == Formats.QRCode)
+            {
+                string[] allowedExtensions = { "jpg" };
+
+                var files = Directory
+               .GetFiles(folder)
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
+               .ToList();
+
+                string[] fnames = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    fnames[i] = Path.GetFileName(files.ElementAt(i));
+                    string ext = Path.GetExtension(files.ElementAt(i));
+
+                    try
+                    {
+                        var coin = ReadQRCode(files[i]);
+                        folderCoins.Add(coin);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+            if (format == Formats.CSV)
+            {
+                string[] allowedExtensions = { "csv" };
+
+                var files = Directory
+               .GetFiles(folder)
+               .Where(file => allowedExtensions.Any(file.ToLower().EndsWith))
+               .ToList();
+
+                string[] fnames = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    fnames[i] = Path.GetFileName(files.ElementAt(i));
+                    string ext = Path.GetExtension(files.ElementAt(i));
+
+                    try
+                    {
+                        var coin = ReadCSVCoins(files[i]);
+                        coin.RemoveAll(item => item == null);
+                        folderCoins.AddRange(coin);
                     }
                     catch (Exception e)
                     {
@@ -98,7 +150,14 @@ namespace CloudCoinCore
             return folderCoins;
         }
 
-            public List<CloudCoin> LoadFolderCoins(string folder)
+        public List<CloudCoin> LoadFolderBarCodes(string folder)
+        {
+            List<CloudCoin> folderCoins = new List<CloudCoin>();
+
+            return folderCoins;
+        }
+
+        public List<CloudCoin> LoadFolderCoins(string folder)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
 
@@ -132,29 +191,84 @@ namespace CloudCoinCore
 
                     }
                 }
+                if (ext == ".csv")
+                {
+                    var lines = File.ReadAllLines(files[i]);
+                    //var lines = File.ReadAllLines(fileName).Select(a => a.Split(','));
+                    List<CloudCoin> CsvCoins = new List<CloudCoin>();
+
+
+                    foreach (var line in lines)
+                    {
+                        CsvCoins.Add(CloudCoin.FromCSV(line));
+                    }
+                    CsvCoins.RemoveAll(item => item == null);
+                    folderCoins.AddRange(CsvCoins);
+                }
             };
 
             return folderCoins;
         }
 
-        private CloudCoin readQRCode(String fileName)//Move one jpeg to suspect folder. 
+        private CloudCoin ReadQRCode(String fileName)//Read a CloudCoin from QR Code 
         {
             CloudCoin coin = new CloudCoin();
 
-            IBarcodeReader reader = new BarcodeReader();
-            // load a bitmap
-            //var barcodeBitmap = (System.Drawing.Bitmap)Image.LoadFrom("C:\\sample-barcode-image.png");
-            //// detect and decode the barcode inside the bitmap
-            //var result = reader.Decode(barcodeBitmap);
-            //// do something with the result
-            //if (result != null)
+            //try
             //{
-                
+            //    Bitmap bitmap = new Bitmap(fileName);
+            //    BarcodeReader reader = new BarcodeReader { AutoRotate = true, TryInverted = true };
+            //    Result result = reader.Decode(bitmap);
+            //    string decoded = result.ToString().Trim();
+
+            //    CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+            //    return cloudCoin;
+            //}
+            //catch (Exception)
+            //{
+            //    return null;
             //}
 
             return coin;
         }
-            private CloudCoin importJPEG(String fileName)//Move one jpeg to suspect folder. 
+
+        private CloudCoin ReadBARCode(String fileName)//Read a CloudCoin from BAR Code . 
+        {
+            CloudCoin coin = new CloudCoin();
+
+            return coin;
+            //try
+            //{
+            //    var barcodeReader = new BarcodeReader();
+            //    Bitmap bitmap = new Bitmap(fileName);
+
+            //    var barcodeResult = barcodeReader.Decode(bitmap);
+            //    string decoded = barcodeResult.ToString().Trim();
+
+            //    CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+            //    return cloudCoin;
+            //}
+            //catch (Exception)
+            //{
+            //    return null;
+            //}
+        }
+
+        private List<CloudCoin> ReadCSVCoins(String fileName)//Read a CloudCoin from CSV . 
+        {
+            List<CloudCoin> cloudCoins = new List<CloudCoin>();
+            var lines = File.ReadAllLines(fileName);
+            //var lines = File.ReadAllLines(fileName).Select(a => a.Split(','));
+
+            CloudCoin coin = new CloudCoin();
+
+            foreach (var line in lines)
+            {
+                cloudCoins.Add(CloudCoin.FromCSV(line));
+            }
+            return cloudCoins;
+        }
+        private CloudCoin importJPEG(String fileName)//Move one jpeg to suspect folder. 
         {
             // bool isSuccessful = false;
             // Console.Out.WriteLine("Trying to load: " + this.fileUtils.importFolder + fileName );
@@ -533,7 +647,22 @@ namespace CloudCoinCore
             }
         }
 
-        public void WriteCoin(IEnumerable<CloudCoin> coins, string folder, bool writeAll = false)
+        public void WriteCoinToFile(CloudCoin coin, string filename)
+        {
+
+
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            Stack stack = new Stack(coin);
+            using (StreamWriter sw = new StreamWriter(filename))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, stack);
+            }
+        }
+
+        public void WriteCoin(IEnumerable<CloudCoin> coins, string folder, bool replaceExisting = true, bool writeAll = false)
         {
             if (writeAll)
             {
@@ -557,7 +686,7 @@ namespace CloudCoinCore
                 int coinExists = (from x in folderCoins
                                   where x.sn == coin.sn
                                   select x).Count();
-                if (coinExists > 0)
+                if (coinExists > 0 && replaceExisting)
                 {
                     string suffix = Utils.RandomString(16);
                     fileName += suffix.ToLower();
@@ -611,7 +740,7 @@ namespace CloudCoinCore
             cc.pan = null;
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
             string json = JsonConvert.SerializeObject(cc);
-            
+
             try
             {
                 json.Replace("\\", "");
@@ -623,7 +752,7 @@ namespace CloudCoinCore
 
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return false;
@@ -633,24 +762,60 @@ namespace CloudCoinCore
 
         public bool writeBarCode(CloudCoin cc, string tag)
         {
-            string fileName = ExportFolder + cc.FileName + "barcode." + tag + ".jpg";
-            cc.pan = null;
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-       
+            //string fileName = ExportFolder + cc.FileName + "barcode." + tag + ".jpg";
+            //cc.pan = null;
+            //QRCodeGenerator qrGenerator = new QRCodeGenerator();
 
-            try
-            {
-                string json = JsonConvert.SerializeObject(cc);
-                var barcode = new Barcode(json, Settings.Default);
-                barcode.Canvas.SaveBmp(fileName);
 
-                return true;
-            }
-            catch (Exception e)
+            //try
+            //{
+            //    string json = JsonConvert.SerializeObject(cc);
+            //    var barcode = new Barcode(json, Settings.Default);
+            //    barcode.Canvas.SaveBmp(fileName);
+
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //    return false;
+            //}
+            return true;
+        }
+
+        public abstract bool WriteCoinToJpeg(CloudCoin cloudCoin, string TemplateFile, string OutputFile, string tag);
+
+        public abstract bool WriteCoinToQRCode(CloudCoin cloudCoin, string OutputFile, string tag);
+
+        public abstract bool WriteCoinToBARCode(CloudCoin cloudCoin, string OutputFile, string tag);
+
+        public string GetCoinTemplate(CloudCoin cloudCoin)
+        {
+            int denomination = cloudCoin.denomination;
+            string TemplatePath = "";
+            switch (denomination)
             {
-                Console.WriteLine(e.Message);
-                return false;
+                case 1:
+                    TemplatePath = this.TemplateFolder + "jpeg1.jpg";
+                    break;
+                case 5:
+                    TemplatePath = this.TemplateFolder + "jpeg5.jpg";
+                    break;
+                case 25:
+                    TemplatePath = this.TemplateFolder + "jpeg25.jpg";
+                    break;
+                case 100:
+                    TemplatePath = this.TemplateFolder + "jpeg100.jpg";
+                    break;
+                case 250:
+                    TemplatePath = this.TemplateFolder + "jpeg250.jpg";
+                    break;
+
+                default:
+                    break;
+
             }
+            return TemplatePath;
         }
         public bool writeJpeg(CloudCoin cc, string tag)
         {
@@ -756,12 +921,12 @@ namespace CloudCoinCore
             return fileSavedSuccessfully;
         }//end write JPEG
 
-        public bool writeJpeg(CloudCoin cc, string tag,string filePath)
+        public bool writeJpeg(CloudCoin cc, string tag, string filePath)
         {
             // Console.Out.WriteLine("Writing jpeg " + cc.sn);
 
             //  CoinUtils cu = new CoinUtils(cc);
-            filePath = filePath.Replace("\\\\","\\");
+            filePath = filePath.Replace("\\\\", "\\");
             bool fileSavedSuccessfully = true;
 
             /* BUILD THE CLOUDCOIN STRING */
@@ -847,14 +1012,14 @@ namespace CloudCoinCore
                 tag = rInt.ToString();
             }
 
-            string fileName = ExportFolder + cc.FileName  + ".jpg";
+            string fileName = ExportFolder + cc.FileName + ".jpg";
             File.WriteAllBytes(fileName, b1.ToArray());
             Console.Out.WriteLine("Writing to " + fileName);
             //CoreLogger.Log("Writing to " + fileName);
             return fileSavedSuccessfully;
         }//end write JPEG
 
-        public bool writeJpeg(CloudCoin cc, string tag, string filePath,string targetPath)
+        public bool writeJpeg(CloudCoin cc, string tag, string filePath, string targetPath)
         {
             // Console.Out.WriteLine("Writing jpeg " + cc.sn);
 
@@ -952,7 +1117,7 @@ namespace CloudCoinCore
             return fileSavedSuccessfully;
         }//end write JPEG
 
-        public bool writeJpeg(CloudCoin cc, string tag, string filePath, string targetPath,string printMessage)
+        public bool writeJpeg(CloudCoin cc, string tag, string filePath, string targetPath, string printMessage)
         {
             // Console.Out.WriteLine("Writing jpeg " + cc.sn);
 

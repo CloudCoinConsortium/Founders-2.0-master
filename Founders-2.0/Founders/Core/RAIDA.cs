@@ -226,7 +226,7 @@ namespace CloudCoinCore
             for (int i = 0; i < LotCount; i++)
             {
                 //Pick up 200 Coins and send them to RAIDA
-                var coins = predetectCoins.Skip(i * Config.MultiDetectLoad).Take(200);
+                var coins = predetectCoins.Skip(i * Config.MultiDetectLoad).Take(Config.MultiDetectLoad);
                 try
                 {
                     raida.coins = coins;
@@ -269,7 +269,7 @@ namespace CloudCoinCore
                     pge.MinorProgress = (CoinCount - 1) * 100 / totalCoinCount;
                     Debug.WriteLine("Minor Progress- " + pge.MinorProgress);
                     raida.OnProgressChanged(pge);
-                    FS.WriteCoin(coins, FS.DetectedFolder);
+                    FS.WriteCoin(coins, FS.DetectedFolder,false);
                     FS.RemoveCoins(coins, FS.PreDetectFolder);
 
                     updateLog(pge.MinorProgress + " % of Coins on Network " + NetworkNumber + " processed.");
@@ -324,7 +324,7 @@ namespace CloudCoinCore
             FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder);
             FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder);
 
-            //FS.WriteCoin(failedCoins, FS.CounterfeitFolder, true);
+            FS.WriteCoin(failedCoins, FS.CounterfeitFolder,false, true);
             FS.MoveCoins(lostCoins, FS.DetectedFolder, FS.LostFolder);
             FS.MoveCoins(suspectCoins, FS.DetectedFolder, FS.SuspectFolder);
 

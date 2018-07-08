@@ -542,6 +542,42 @@ namespace CloudCoinCore
                 }
             }
         }//end sort folder
+
+        public void Grade()
+        {
+            //figures out which folder to put it in. 
+            //pown = pown.Replace('d', 'e').Replace('n', 'e').Replace('u', 'e');
+            //pown = pown.Replace('n','e');
+            //pown = pown.Replace('u', 'e');
+            int PassCount = 0;
+            PassCount = pown.Count(p => p == 'p');
+            int FailCout = pown.Count(f => f == 'f');
+
+            if (PassCount>=20)
+            {
+                if(FailCount >0)
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.FrackedFolder;
+                }
+                else
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.BankFolder;
+                }
+            }
+            else
+            {
+                if(PassCount+FailCount >20)
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.CounterfeitFolder;
+                }
+                else
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.LostFolder;
+                }
+            }
+
+        }//end Grade
+
         public bool noResponses()
         {
             //Does the coin have no-responses from the RIDA. This means the RAIDA may be using its PAN or AN

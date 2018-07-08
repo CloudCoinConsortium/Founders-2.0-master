@@ -55,6 +55,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="System.Drawing.Common">
+      <HintPath>..\Founders\bin\Debug\System.Drawing.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="FounderSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
