@@ -344,6 +344,7 @@ namespace CloudCoinCore
                     if (json.IsSuccessStatusCode)//200 status good
                     {
                         totalResponse = await json.Content.ReadAsStringAsync();
+                        RAIDA.logger.Info("Response Recieved - " + totalResponse);
                         Debug.WriteLine("RAIDA " + NodeNumber + " returned good: " + json.StatusCode);
                         //  Console.Out.WriteLine(totalResponse);
                     }

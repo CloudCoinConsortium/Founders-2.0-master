@@ -271,7 +271,7 @@ namespace Founders_2._0
 
                     if (pown.HasValue() || detection.HasValue() || import.HasValue())
                     {
-                        await RAIDA.ProcessCoins(false);
+                        await RAIDA.ProcessCoins(true);
                     }
                     if (greeting.HasValue())
                     {

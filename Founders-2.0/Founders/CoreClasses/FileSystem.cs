@@ -41,6 +41,7 @@ namespace CloudCoinClient.CoreClasses
             RequestsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_REQUESTS + Path.DirectorySeparatorChar;
             DangerousFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_DANGEROUS + Path.DirectorySeparatorChar;
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
+            ResponseFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_RESPONSE + Path.DirectorySeparatorChar;
             QRFolder = ImportFolder + Config.TAG_QR;
             BarCodeFolder = ImportFolder + Config.TAG_BARCODE;
             CSVFolder = ImportFolder + Config.TAG_CSV;
@@ -94,6 +95,7 @@ namespace CloudCoinClient.CoreClasses
                 Directory.CreateDirectory(QRFolder);
                 Directory.CreateDirectory(BarCodeFolder);
                 Directory.CreateDirectory(CSVFolder);
+                Directory.CreateDirectory(ResponseFolder);
 
             }
             catch (Exception e)

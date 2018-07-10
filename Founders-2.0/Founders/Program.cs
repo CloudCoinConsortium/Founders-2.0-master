@@ -271,7 +271,7 @@ CommandOption echo = commandLineApplication.Option(
 
                     if (pown.HasValue() || detection.HasValue() || import.HasValue())
                     {
-                        await RAIDA.ProcessCoins(false);
+                        await RAIDA.ProcessCoins(true);
                     }
                     if (greeting.HasValue())
                     {
@@ -767,6 +767,8 @@ CommandOption echo = commandLineApplication.Option(
             exportCoins.AddRange(hundredsToExport);
             exportCoins.AddRange(twoFiftiesToExport);
 
+            exportCoins.ForEach(x => x.pan = null);
+
             // Export Coins as jPeg Images
             if (file_type == 1)
             {
@@ -839,7 +841,7 @@ CommandOption echo = commandLineApplication.Option(
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin Exported as QR code to " + OutputFile);
-                        Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
+                        //Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
                     }
                 }
 
@@ -1143,7 +1145,7 @@ CommandOption echo = commandLineApplication.Option(
         static bool OnReceive(string hash)
         {
             Console.WriteLine("https://escrow.cloudcoin.digital/cc.php?h=" + hash);
-            DownloadCoin(hash);
+           // DownloadCoin(hash);
             return true;
         }
 

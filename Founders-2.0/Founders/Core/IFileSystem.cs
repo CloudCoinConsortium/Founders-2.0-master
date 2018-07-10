@@ -41,6 +41,7 @@ namespace CloudCoinCore
         public string CSVFolder { get; set; }
 
         //public abstract IFileSystem(string path);
+        public string ResponseFolder { get; set; }
 
         public static IEnumerable<CloudCoin> importCoins;
         public static IEnumerable<CloudCoin> exportCoins;
