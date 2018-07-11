@@ -572,8 +572,8 @@ CommandOption echo = commandLineApplication.Option(
                 {
                     break;
                 }
-                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", network.NetworkNumber));
-                Console.Out.WriteLine("----------------------------------\n");
+                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
+                Console.Out.WriteLine("----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));

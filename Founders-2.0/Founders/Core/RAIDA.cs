@@ -264,6 +264,7 @@ namespace CloudCoinCore
                         pge.MinorProgress = (CoinCount) * 100 / totalCoinCount;
                         Debug.WriteLine("Minor Progress- " + pge.MinorProgress);
                         raida.OnProgressChanged(pge);
+                        coin.doPostProcessing();
                         j++;
                     }
                     pge.MinorProgress = (CoinCount - 1) * 100 / totalCoinCount;
@@ -291,6 +292,7 @@ namespace CloudCoinCore
 
             // Apply Sort to Folder to all detected coins at once.
             updateLog("Starting Sort.....");
+            //detectedCoins.ForEach(x => x.doPostProcessing());
             detectedCoins.ForEach(x => x.SortToFolder());
             updateLog("Ended Sort........");
 

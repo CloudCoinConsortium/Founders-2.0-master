@@ -267,6 +267,8 @@ namespace CloudCoinCore
 
             // Apply Sort to Folder to all detected coins at once.
             updateLog("Starting Sort.....");
+            detectedCoins.ForEach(x => x.doPostProcessing());
+
             detectedCoins.ForEach(x => x.SortToFolder());
             updateLog("Ended Sort........");
 
