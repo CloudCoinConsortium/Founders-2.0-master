@@ -184,6 +184,11 @@ CommandOption echo = commandLineApplication.Option(
                 "List Coins in a folder.",
                 CommandOptionType.NoValue);
 
+            CommandOption serials = commandLineApplication.Option(
+    "-$|-sno |--serials ",
+    "Displays Serial numbers of the folder on console.",
+    CommandOptionType.SingleValue);
+
 
             CommandOption backup = commandLineApplication.Option(
             "-$|-ba |--backup ",
@@ -259,6 +264,10 @@ CommandOption echo = commandLineApplication.Option(
                         RAIDA.logger = logger;
                         fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
                     }
+                    if (serials.HasValue())
+                    {
+                        ShowSerialNumbers(serials.Value());
+                    }
                     if (echo.HasValue())
                     {
                         //ech();
@@ -310,6 +319,47 @@ CommandOption echo = commandLineApplication.Option(
 
         }
 
+        private static void ShowSerialNumbers(string FolderName)
+        {
+            Console.WriteLine("Printing Serials");
+            var table = new ConsoleTable("Number", "Serial", "Denomination", "Pown" ,"File Name");
+
+            var coins  = FS.LoadFolderCoins(FolderName).OrderBy(x=>x.sn);
+
+            int i = 1;
+            foreach(var coin in coins)
+            {
+                table.AddRow(i++, coin.sn, coin.denomination, coin.pown,coin.ExistingFileName);
+            }
+
+            table.Write();
+            int onesCount = (from x in coins
+                             where x.denomination == 1
+                             select x).Count();
+            int fivesCount = (from x in coins
+                             where x.denomination == 5
+                             select x).Count();
+            int qtrCount = (from x in coins
+                              where x.denomination == 25
+                              select x).Count();
+            int hundredsCount = (from x in coins
+                              where x.denomination == 100
+                              select x).Count();
+            int twoFiftiesCount = (from x in coins
+                              where x.denomination == 250
+                              select x).Count();
+
+            Console.WriteLine("Total 1s : " + onesCount);
+            Console.WriteLine("Total 5s : " + fivesCount);
+            Console.WriteLine("Total 25s : " + qtrCount);
+            Console.WriteLine("Total 100s : " + hundredsCount);
+            Console.WriteLine("Total 250s : " + twoFiftiesCount);
+
+
+
+
+
+        }
         private static void Raida_LoggerHandler(object sender, EventArgs e)
         {
             ProgressChangedEventArgs pge = (ProgressChangedEventArgs)e;

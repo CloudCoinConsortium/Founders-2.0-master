@@ -58,6 +58,8 @@ namespace CloudCoinCore
         public DetectionResult detectionResult { get; set; }
         [JsonIgnore]
         public DetectionStatus DetectResult { get; set; }
+        [JsonIgnore]
+        public string ExistingFileName { get; set; }
         public int PassCount { get { return passCount; } set { passCount = value; if (passCount >= Config.PassCount) DetectionResult = "Pass"; else DetectionResult = "Fail"; } }
         private int passCount = 0;
         private int failCount = 0;

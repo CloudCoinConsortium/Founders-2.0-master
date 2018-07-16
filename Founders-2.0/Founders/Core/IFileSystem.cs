@@ -178,13 +178,17 @@ namespace CloudCoinCore
                 {
                     var coins = Utils.LoadJson(files[i]);
                     if (coins != null)
+                    {
+                        coins.ToList().ForEach(x => x.ExistingFileName = files[i]);
                         folderCoins.AddRange(coins);
+                    }
                 }
                 if (ext == ".jpeg" || ext == ".jpg")
                 {
                     try
                     {
                         var coin = importJPEG(files[i]);
+                        coin.ExistingFileName = files[i];
                         folderCoins.Add(coin);
                     }
                     catch (Exception e)
@@ -203,6 +207,7 @@ namespace CloudCoinCore
                     {
                         CsvCoins.Add(CloudCoin.FromCSV(line));
                     }
+                    CsvCoins.ForEach(x => x.ExistingFileName = files[i]);
                     CsvCoins.RemoveAll(item => item == null);
                     folderCoins.AddRange(CsvCoins);
                 }
