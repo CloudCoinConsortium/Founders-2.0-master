@@ -60,6 +60,9 @@ namespace CloudCoinCore
                         if (!continueExecution)
                         {
                             Debug.WriteLine("Aborting Fix ");
+                            pge.MajorProgressMessage = ("Aborting Fix ");
+                            raida.OnLogRecieved(pge);
+
                             return "Aborting for new operation";
                         }
                         Response fixResponse = RAIDA.GetInstance().nodes[raida_ID].Fix(trustedTriad, raida.nodes[trustedTriad[0]].Ticket, raida.nodes[trustedTriad[1]].Ticket, raida.nodes[trustedTriad[2]].Ticket, cc.an[raida_ID]).Result;
@@ -69,6 +72,7 @@ namespace CloudCoinCore
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Out.WriteLine("");
                             Console.Out.WriteLine("RAIDA" + raida_ID + " unfracked successfully.");
+
                             pge.MajorProgressMessage = "RAIDA" + raida_ID + " unfracked successfully.";
                             raida.OnLogRecieved(pge);
                             //CoreLogger.Log("RAIDA" + raida_ID + " unfracked successfully.");
@@ -141,6 +145,7 @@ namespace CloudCoinCore
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Out.WriteLine("You have no fracked coins.");
+                
                 //CoreLogger.Log("You have no fracked coins.");
                 Console.ForegroundColor = ConsoleColor.White;
             }//no coins to unfrack

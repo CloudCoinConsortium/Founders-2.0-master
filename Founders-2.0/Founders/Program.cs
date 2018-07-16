@@ -71,7 +71,7 @@ namespace Founders
       //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
             Console.WriteLine("10. Exit");
             Console.Write(prompt);
-            var result = Console.ReadLine();
+            var result = reader.readInt(1,10);
             return Convert.ToInt32(result);
         }
 
@@ -226,7 +226,8 @@ CommandOption echo = commandLineApplication.Option(
 
                 RAIDA.logger = logger;
                 fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
-
+                raida = RAIDA.GetInstance();
+                raida.LoggerHandler += Raida_LoggerHandler;
                 EchoRaida().Wait();
                 printWelcome();
                 while (true)
@@ -307,6 +308,12 @@ CommandOption echo = commandLineApplication.Option(
                 commandLineApplication.Execute(args);
             }
 
+        }
+
+        private static void Raida_LoggerHandler(object sender, EventArgs e)
+        {
+            ProgressChangedEventArgs pge = (ProgressChangedEventArgs)e;
+            logger.Info(pge.MajorProgressMessage);
         }
 
         private static void showCoins()
@@ -614,21 +621,23 @@ CommandOption echo = commandLineApplication.Option(
 
         public async static Task EchoRaida()
         {
-            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", NetworkNumber));
-            Console.Out.WriteLine("----------------------------------\n");
+            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
+            Console.Out.WriteLine("----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
-            Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+            updateLog("Ready Count -" + raida.ReadyCount);
+            updateLog("Not Ready Count -" + raida.NotReadyCount);
+            //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
+            //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
-            for (int i = 0; i < raida.nodes.Count(); i++)
-            {
-                Debug.WriteLine("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-                //updateLog("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-            }
-            Console.Out.WriteLine("-----------------------------------\n");
+            //for (int i = 0; i < raida.nodes.Count(); i++)
+            //{
+            //    Debug.WriteLine("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
+            //    //updateLog("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
+            //}
+            Console.Out.WriteLine("-----------------------------------");
 
         }
 
@@ -1015,10 +1024,17 @@ CommandOption echo = commandLineApplication.Option(
 
         private static void Fix()
         {
-            fixer.continueExecution = true;
-            fixer.IsFixing = true;
-            fixer.FixAll();
-            fixer.IsFixing = false;
+            if (FileSystem.frackedCoins.Count() > 0)
+            {
+                fixer.continueExecution = true;
+                fixer.IsFixing = true;
+                fixer.FixAll();
+                fixer.IsFixing = false;
+            }
+            else
+            {
+                Console.Out.WriteLine("There are no fracked coins to fix.");
+            }
         }
 
         public static void ShowFolders()

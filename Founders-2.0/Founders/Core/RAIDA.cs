@@ -501,6 +501,5 @@ namespace CloudCoinCore
         }
         public Response[,] responseArrayMulti;
 
-
     }
 }

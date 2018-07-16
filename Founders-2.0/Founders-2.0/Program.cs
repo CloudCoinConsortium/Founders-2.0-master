@@ -1013,10 +1013,17 @@ namespace Founders_2._0
 
         private static void Fix()
         {
-            fixer.continueExecution = true;
-            fixer.IsFixing = true;
-            fixer.FixAll();
-            fixer.IsFixing = false;
+            if (FileSystem.frackedCoins.Count() > 0)
+            {
+                fixer.continueExecution = true;
+                fixer.IsFixing = true;
+                fixer.FixAll();
+                fixer.IsFixing = false;
+            }
+            else
+            {
+                Console.Out.WriteLine("There are no fracked coins to fix.");
+            }
         }
 
         public static void ShowFolders()
