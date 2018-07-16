@@ -17,7 +17,7 @@ using McMaster.Extensions.CommandLineUtils;
 using ConsoleTables;
 using System.Text;
 
-namespace Founders_2._0
+namespace Founders
 {
     class Program
     {
@@ -71,7 +71,7 @@ namespace Founders_2._0
             //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
             Console.WriteLine("10. Exit");
             Console.Write(prompt);
-            var result = Console.ReadLine();
+            var result = reader.readInt(1, 10);
             return Convert.ToInt32(result);
         }
 
@@ -184,6 +184,11 @@ namespace Founders_2._0
                 "List Coins in a folder.",
                 CommandOptionType.NoValue);
 
+            CommandOption serials = commandLineApplication.Option(
+    "-$|-sno |--serials ",
+    "Displays Serial numbers of the folder on console.",
+    CommandOptionType.SingleValue);
+
 
             CommandOption backup = commandLineApplication.Option(
             "-$|-ba |--backup ",
@@ -226,7 +231,8 @@ namespace Founders_2._0
 
                 RAIDA.logger = logger;
                 fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
-
+                raida = RAIDA.GetInstance();
+                raida.LoggerHandler += Raida_LoggerHandler;
                 EchoRaida().Wait();
                 printWelcome();
                 while (true)
@@ -257,6 +263,10 @@ namespace Founders_2._0
 
                         RAIDA.logger = logger;
                         fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
+                    }
+                    if (serials.HasValue())
+                    {
+                        ShowSerialNumbers(serials.Value());
                     }
                     if (echo.HasValue())
                     {
@@ -307,6 +317,53 @@ namespace Founders_2._0
                 commandLineApplication.Execute(args);
             }
 
+        }
+
+        private static void ShowSerialNumbers(string FolderName)
+        {
+            Console.WriteLine("Printing Serials");
+            var table = new ConsoleTable("Number", "Serial", "Denomination", "Pown", "File Name");
+
+            var coins = FS.LoadFolderCoins(FolderName).OrderBy(x => x.sn);
+
+            int i = 1;
+            foreach (var coin in coins)
+            {
+                table.AddRow(i++, coin.sn, coin.denomination, coin.pown, coin.ExistingFileName);
+            }
+
+            table.Write();
+            int onesCount = (from x in coins
+                             where x.denomination == 1
+                             select x).Count();
+            int fivesCount = (from x in coins
+                              where x.denomination == 5
+                              select x).Count();
+            int qtrCount = (from x in coins
+                            where x.denomination == 25
+                            select x).Count();
+            int hundredsCount = (from x in coins
+                                 where x.denomination == 100
+                                 select x).Count();
+            int twoFiftiesCount = (from x in coins
+                                   where x.denomination == 250
+                                   select x).Count();
+
+            Console.WriteLine("Total 1s : " + onesCount);
+            Console.WriteLine("Total 5s : " + fivesCount);
+            Console.WriteLine("Total 25s : " + qtrCount);
+            Console.WriteLine("Total 100s : " + hundredsCount);
+            Console.WriteLine("Total 250s : " + twoFiftiesCount);
+
+
+
+
+
+        }
+        private static void Raida_LoggerHandler(object sender, EventArgs e)
+        {
+            ProgressChangedEventArgs pge = (ProgressChangedEventArgs)e;
+            logger.Info(pge.MajorProgressMessage);
         }
 
         private static void showCoins()
@@ -572,8 +629,8 @@ namespace Founders_2._0
                 {
                     break;
                 }
-                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", network.NetworkNumber));
-                Console.Out.WriteLine("----------------------------------\n");
+                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
+                Console.Out.WriteLine("----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
@@ -614,21 +671,23 @@ namespace Founders_2._0
 
         public async static Task EchoRaida()
         {
-            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}\n", NetworkNumber));
-            Console.Out.WriteLine("----------------------------------\n");
+            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
+            Console.Out.WriteLine("----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
-            Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+            updateLog("Ready Count -" + raida.ReadyCount);
+            updateLog("Not Ready Count -" + raida.NotReadyCount);
+            //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
+            //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
-            for (int i = 0; i < raida.nodes.Count(); i++)
-            {
-                Debug.WriteLine("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-                //updateLog("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-            }
-            Console.Out.WriteLine("-----------------------------------\n");
+            //for (int i = 0; i < raida.nodes.Count(); i++)
+            //{
+            //    Debug.WriteLine("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
+            //    //updateLog("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
+            //}
+            Console.Out.WriteLine("-----------------------------------");
 
         }
 
@@ -767,6 +826,8 @@ namespace Founders_2._0
             exportCoins.AddRange(hundredsToExport);
             exportCoins.AddRange(twoFiftiesToExport);
 
+            exportCoins.ForEach(x => x.pan = null);
+
             // Export Coins as jPeg Images
             if (file_type == 1)
             {
@@ -839,7 +900,7 @@ namespace Founders_2._0
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin Exported as QR code to " + OutputFile);
-                        Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
+                        //Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
                     }
                 }
 
@@ -1150,7 +1211,7 @@ namespace Founders_2._0
         static bool OnReceive(string hash)
         {
             Console.WriteLine("https://escrow.cloudcoin.digital/cc.php?h=" + hash);
-            DownloadCoin(hash);
+            // DownloadCoin(hash);
             return true;
         }
 

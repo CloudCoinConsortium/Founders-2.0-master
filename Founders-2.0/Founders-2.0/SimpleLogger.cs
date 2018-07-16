@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Founders_2
+namespace Founders
 {
     public class SimpleLogger
     {

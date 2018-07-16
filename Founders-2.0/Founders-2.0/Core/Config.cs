@@ -20,6 +20,8 @@ namespace CloudCoinCore
         public static string TAG_TRASH = "Trash";
         public static string TAG_SUSPECT = "Suspect";
         public static string TAG_PREDETECT = "Predetect";
+        public static string TAG_RESPONSE = "Response";
+
         public static string URL_DIRECTORY = "http://michael.pravoslavnye.ru/";
         public static string TAG_REQUESTS = "Requests";
         public const int YEARSTILEXPIRE = 2;
@@ -33,7 +35,7 @@ namespace CloudCoinCore
 
         public enum Folder { Suspect, Counterfeit, Fracked, Bank, Trash };
 
-        public static string[] allowedExtensions = new[] { ".stack", ".jpeg", ".chest", ".bank", ".jpg",".celebrium",".celeb" };
+        public static string[] allowedExtensions = new[] { ".stack", ".jpeg", ".chest", ".bank", ".jpg",".celebrium",".celeb",".csv" };
 
         public static string TAG_DANGEROUS = "Dangerous";
         public static string TAG_LOGS = "Logs";

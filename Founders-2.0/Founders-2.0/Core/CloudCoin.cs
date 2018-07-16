@@ -58,6 +58,8 @@ namespace CloudCoinCore
         public DetectionResult detectionResult { get; set; }
         [JsonIgnore]
         public DetectionStatus DetectResult { get; set; }
+        [JsonIgnore]
+        public string ExistingFileName { get; set; }
         public int PassCount { get { return passCount; } set { passCount = value; if (passCount >= Config.PassCount) DetectionResult = "Pass"; else DetectionResult = "Fail"; } }
         private int passCount = 0;
         private int failCount = 0;
@@ -88,6 +90,20 @@ namespace CloudCoinCore
         {
 
         }//end of constructor
+
+        public static CloudCoin FromJson(string csvLine)
+        {
+            try
+            {
+
+            }
+            catch(Exception e)
+            {
+
+            }
+            return null;
+
+        }
         public static CloudCoin FromCSV(string csvLine)
         {
             try
@@ -295,12 +311,12 @@ namespace CloudCoinCore
                 if (UP_LEFT.Success || UP_RIGHT.Success || DOWN_LEFT.Success || DOWN_RIGHT.Success || UP_LEFT_n.Success || UP_RIGHT_n.Success || DOWN_LEFT_n.Success || DOWN_RIGHT_n.Success || UP_LEFT_e.Success || UP_RIGHT_e.Success || DOWN_LEFT_e.Success || DOWN_RIGHT_e.Success || UP_LEFT_u.Success || UP_RIGHT_u.Success || DOWN_LEFT_u.Success || DOWN_RIGHT_u.Success)
                 {
                     canFix = true;
-                    Console.Out.WriteLine("isFixable");
+                    //Console.Out.WriteLine("isFixable");
                 }
                 else
                 {
                     canFix = false;
-                    Console.Out.WriteLine("Not isFixable");
+                    //Console.Out.WriteLine("Not isFixable");
                 }
 
 
@@ -316,7 +332,7 @@ namespace CloudCoinCore
             else
             {
                 canFix = false;
-                Console.Out.WriteLine("Not isFixable");
+//                Console.Out.WriteLine("Not isFixable");
             }
             pown = origPown;
             return canFix;
@@ -528,6 +544,42 @@ namespace CloudCoinCore
                 }
             }
         }//end sort folder
+
+        public void Grade()
+        {
+            //figures out which folder to put it in. 
+            //pown = pown.Replace('d', 'e').Replace('n', 'e').Replace('u', 'e');
+            //pown = pown.Replace('n','e');
+            //pown = pown.Replace('u', 'e');
+            int PassCount = 0;
+            PassCount = pown.Count(p => p == 'p');
+            int FailCout = pown.Count(f => f == 'f');
+
+            if (PassCount>=20)
+            {
+                if(FailCount >0)
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.FrackedFolder;
+                }
+                else
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.BankFolder;
+                }
+            }
+            else
+            {
+                if(PassCount+FailCount >20)
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.CounterfeitFolder;
+                }
+                else
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.LostFolder;
+                }
+            }
+
+        }//end Grade
+
         public bool noResponses()
         {
             //Does the coin have no-responses from the RIDA. This means the RAIDA may be using its PAN or AN
@@ -548,11 +600,11 @@ namespace CloudCoinCore
             if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
             {
                 returnTruth = true;
-                Console.Out.WriteLine("isGradable");
+                //Console.Out.WriteLine("isGradable");
             }
             else
             {
-                Console.Out.WriteLine("Not isGradable");
+                //Console.Out.WriteLine("Not isGradable");
             }
             return returnTruth;
         }//end is gradable pass

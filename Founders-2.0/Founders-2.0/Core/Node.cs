@@ -51,12 +51,12 @@ namespace CloudCoinCore
             Debug.WriteLine(FullUrl);
         }
 
-        public Node(int NodeNumber, RAIDANode node)
+        public Node(int NodeNumber,RAIDANode node)
         {
             this.NodeNumber = NodeNumber;
             this.node = node;
             FullUrl = GetFullURL();
-            FullUrl = "https://" + node.urls[0].url + "/service/";
+            FullUrl = "https://" +node.urls[0].url+"/service/";
             Debug.WriteLine(FullUrl);
         }
 
@@ -134,7 +134,7 @@ namespace CloudCoinCore
                 {
                     echoresult = JsonConvert.DeserializeObject<NodeEchoResponse>(echoResponse.fullResponse);
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
 
                 }
@@ -344,6 +344,7 @@ namespace CloudCoinCore
                     if (json.IsSuccessStatusCode)//200 status good
                     {
                         totalResponse = await json.Content.ReadAsStringAsync();
+                        RAIDA.logger.Info("Response Recieved - " + totalResponse);
                         Debug.WriteLine("RAIDA " + NodeNumber + " returned good: " + json.StatusCode);
                         //  Console.Out.WriteLine(totalResponse);
                     }
@@ -485,12 +486,12 @@ namespace CloudCoinCore
         //int[] nn, int[] sn, String[] an, String[] pan, int[] d, int timeout
         public async Task<MultiDetectResponse> MultiDetect()
         {
-
+            
             /*PREPARE REQUEST*/
             try
             {
 
-                var raida = RAIDA.ActiveRAIDA;
+                var raida =RAIDA.ActiveRAIDA ;
                 int[] nn = raida.multiRequest.nn;
                 int[] sn = raida.multiRequest.sn;
                 String[] an = raida.multiRequest.an[NodeNumber - 1];
@@ -707,7 +708,7 @@ namespace CloudCoinCore
                 //    }//end if array lengths are the same
 
                 //}//End Else not a dud
-                //Break the respons into sub responses. 
+                 //Break the respons into sub responses. 
                 MultiDetectTime = Convert.ToInt32(ts.Milliseconds);
                 MultiResponse.responses = response;
                 return MultiResponse;

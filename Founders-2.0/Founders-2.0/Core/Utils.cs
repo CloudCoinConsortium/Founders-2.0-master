@@ -7,9 +7,6 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Linq;
-using ZXing;
-using ZXing.Common;
-using System.Net;
 
 namespace CloudCoinCore
 {
