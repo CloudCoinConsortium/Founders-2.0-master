@@ -691,6 +691,11 @@ namespace Founders
 
         }
 
+        private static void printStarLine()
+        {
+            logger.Info("****************************************************************************************************");
+            Console.Out.WriteLine("****************************************************************************************************");
+        }
         public static void updateLog(string logLine)
         {
             logger.Info(logLine);
@@ -828,6 +833,22 @@ namespace Founders
 
             exportCoins.ForEach(x => x.pan = null);
 
+            printStarLine();
+            updateLog("Starting CloudCoin Export.");
+            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
+            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            printStarLine();
+            string message = "Exporting "+ totalSaved +" CloudCoins from Bank.";
+            updateLog(message);
+            printStarLine();
+            if(totalCoins.Count() >1000)
+            {
+                printStarLine();
+                updateLog("Warning!: You have more than 1000 Notes in your bank.");
+                updateLog("  Stack files should not have more than 1000 Notes in them.");
+                updateLog("  Do not export stack files with more than 1000 notes.");
+                printStarLine();
+            }
             // Export Coins as jPeg Images
             if (file_type == 1)
             {
@@ -970,8 +991,10 @@ namespace Founders
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
                 FS.RemoveCoins(exportCoins, FS.FrackedFolder);
             }
-
-
+            printStarLine();
+            updateLog("Export of the CloudCoins Completed.");
+            updateLog("  Exported "+ exportCoins.Count() +" coins in Total of "+ totalSaved +" CC into " + FS.ExportFolder);
+            printStarLine();
         }
 
         public static void export()
