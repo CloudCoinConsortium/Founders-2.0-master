@@ -744,7 +744,7 @@ CommandOption echo = commandLineApplication.Option(
             Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
             int file_type = reader.readInt(1, 5);
             int stack_type = 1;
-            if(file_type== 2)
+            if (file_type == 2)
             {
                 Console.WriteLine("Export All Coins to Single Stack (1) or One Stack per coin (2)?");
                 stack_type = reader.readInt(1, 2);
@@ -805,14 +805,14 @@ CommandOption echo = commandLineApplication.Option(
                                  where x.denomination == 5
                                  select x).Take(exp_5);
             var qtrToExport = (from x in totalCoins
-                                 where x.denomination == 25
-                                 select x).Take(exp_25);
+                               where x.denomination == 25
+                               select x).Take(exp_25);
             var hundredsToExport = (from x in totalCoins
-                                 where x.denomination == 100
-                                 select x).Take(exp_100);
+                                    where x.denomination == 100
+                                    select x).Take(exp_100);
             var twoFiftiesToExport = (from x in totalCoins
-                                 where x.denomination == 250
-                                 select x).Take(exp_250);
+                                      where x.denomination == 250
+                                      select x).Take(exp_250);
             List<CloudCoin> exportCoins = onesToExport.ToList();
             exportCoins.AddRange(fivesToExport);
             exportCoins.AddRange(qtrToExport);
@@ -821,6 +821,22 @@ CommandOption echo = commandLineApplication.Option(
 
             exportCoins.ForEach(x => x.pan = null);
 
+            printStarLine();
+            updateLog("Starting CloudCoin Export.");
+            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
+            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            printStarLine();
+            string message = "Exporting " + totalSaved + " CloudCoins from Bank.";
+            updateLog(message);
+            printStarLine();
+            if (totalCoins.Count() > 1000)
+            {
+                printStarLine();
+                updateLog("Warning!: You have more than 1000 Notes in your bank.");
+                updateLog("  Stack files should not have more than 1000 Notes in them.");
+                updateLog("  Do not export stack files with more than 1000 notes.");
+                printStarLine();
+            }
             // Export Coins as jPeg Images
             if (file_type == 1)
             {
@@ -833,14 +849,14 @@ CommandOption echo = commandLineApplication.Option(
                     filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
                 }//end if file exists
 
-                foreach(var coin in exportCoins)
+                foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName+ tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + tag + ".jpg";
                     bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin exported as Jpeg to " + OutputFile);
-                        Console.WriteLine("CloudCoin exported as Jpeg to " + OutputFile);
+                        //Console.WriteLine("CloudCoin exported as Jpeg to " + OutputFile);
                     }
                 }
 
@@ -888,7 +904,7 @@ CommandOption echo = commandLineApplication.Option(
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName+".qr" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr" + tag + ".jpg";
                     bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
@@ -907,7 +923,7 @@ CommandOption echo = commandLineApplication.Option(
                 foreach (var coin in exportCoins)
                 {
                     string OutputFile = FS.ExportFolder + coin.FileName + ".barcode" + tag + ".jpg";
-                    bool fileGenerated =  FS.WriteCoinToBARCode(coin, OutputFile, tag);
+                    bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin Exported as Bar code to " + OutputFile);
@@ -956,15 +972,17 @@ CommandOption echo = commandLineApplication.Option(
                     csv.AppendLine(newLine);
 
                 }
-                File.WriteAllText(filename , csv.ToString());
-                updateLog("Coins exported to "+ filename);
+                File.WriteAllText(filename, csv.ToString());
+                updateLog("Coins exported to " + filename);
                 //Console.WriteLine("Coins exported as csv to " + filename);
                 //FS.WriteCoinsToFile(exportCoins, filename, ".s");
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
                 FS.RemoveCoins(exportCoins, FS.FrackedFolder);
             }
-
-
+            printStarLine();
+            updateLog("Export of the CloudCoins Completed.");
+            updateLog("  Exported " + exportCoins.Count() + " coins in Total of " + totalSaved + " CC into " + FS.ExportFolder);
+            printStarLine();
         }
 
         public static void export()
