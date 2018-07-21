@@ -684,6 +684,12 @@ CommandOption echo = commandLineApplication.Option(
 
         }
 
+        private static void printStarLine()
+        {
+            logger.Info("****************************************************************************************************");
+            Console.Out.WriteLine("****************************************************************************************************");
+        }
+
         public static void updateLog(string logLine)
         {
             logger.Info(logLine);
