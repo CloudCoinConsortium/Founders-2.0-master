@@ -207,8 +207,8 @@ namespace CloudCoinCore
                     {
                         CsvCoins.Add(CloudCoin.FromCSV(line));
                     }
-                    CsvCoins.ForEach(x => x.ExistingFileName = files[i]);
                     CsvCoins.RemoveAll(item => item == null);
+                    CsvCoins.ForEach(x => x.ExistingFileName = files[i]);
                     folderCoins.AddRange(CsvCoins);
                 }
             };

@@ -589,16 +589,16 @@ namespace Founders
         }
         public static void printWelcome()
         {
-            Console.WriteLine("");
+            updateLog("");
             Console.BackgroundColor = ConsoleColor.Blue;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Out.WriteLine("                                                                  ");
-            Console.Out.WriteLine("                   CloudCoin Founders Edition                     ");
-            Console.Out.WriteLine("                      Version: July.05.2018                       ");
-            Console.Out.WriteLine("          Used to Authenticate, Store and Payout CloudCoins       ");
-            Console.Out.WriteLine("      This Software is provided as is with all faults, defects    ");
-            Console.Out.WriteLine("          and errors, and without warranty of any kind.           ");
-            Console.Out.WriteLine("                Free from the CloudCoin Consortium.               ");
+            updateLog("                                                                  ");
+            updateLog("                   CloudCoin Founders Edition                     ");
+            updateLog("                      Version: July.05.2018                       ");
+            updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
+            updateLog("      This Software is provided as is with all faults, defects    ");
+            updateLog("          and errors, and without warranty of any kind.           ");
+            updateLog("                Free from the CloudCoin Consortium.               ");
             //Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
             Console.Out.WriteLine("                                                                  ");
 
@@ -634,8 +634,8 @@ namespace Founders
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
-                Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+                Console.Out.WriteLine("Ready Count - " + raida.ReadyCount);
+                Console.Out.WriteLine("Not Ready Count - " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -677,8 +677,8 @@ namespace Founders
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            updateLog("Ready Count -" + raida.ReadyCount);
-            updateLog("Not Ready Count -" + raida.NotReadyCount);
+            updateLog("Ready Count - " + raida.ReadyCount);
+            updateLog("Not Ready Count - " + raida.NotReadyCount);
             //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
             //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
@@ -847,7 +847,7 @@ namespace Founders
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin exported as Jpeg to " + OutputFile);
-                        Console.WriteLine("CloudCoin exported as Jpeg to " + OutputFile);
+                        //Console.WriteLine("CloudCoin exported as Jpeg to " + OutputFile);
                     }
                 }
 
@@ -870,7 +870,7 @@ namespace Founders
                     }//end if file exists
 
                     FS.WriteCoinsToFile(exportCoins, filename, ".stack");
-                    Console.WriteLine("Coins exported as stack file to " + filename);
+                    updateLog("Coins exported as stack file to " + filename);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
                 }
@@ -883,7 +883,7 @@ namespace Founders
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
                         FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-                        Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
+                        //Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
                     }
 
@@ -918,7 +918,7 @@ namespace Founders
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin Exported as Bar code to " + OutputFile);
-                        Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
+                        //Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
                     }
                 }
 
@@ -965,7 +965,7 @@ namespace Founders
                 }
                 File.WriteAllText(filename, csv.ToString());
                 updateLog("Coins exported to " + filename);
-                Console.WriteLine("Coins exported as csv to " + filename);
+                //Console.WriteLine("Coins exported as csv to " + filename);
                 //FS.WriteCoinsToFile(exportCoins, filename, ".s");
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
                 FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -1074,7 +1074,9 @@ namespace Founders
 
         private static void Fix()
         {
-            if (FileSystem.frackedCoins.Count() > 0)
+            var frackedCoins = FS.LoadFolderCoins(FS.FrackedFolder);
+
+            if (frackedCoins.Count() > 0)
             {
                 fixer.continueExecution = true;
                 fixer.IsFixing = true;

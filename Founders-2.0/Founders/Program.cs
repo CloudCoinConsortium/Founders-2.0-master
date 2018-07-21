@@ -589,16 +589,16 @@ CommandOption echo = commandLineApplication.Option(
         }
         public static void printWelcome()
         {
-            Console.WriteLine("");
+            Console.Out.WriteLine("");
             Console.BackgroundColor = ConsoleColor.Blue;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Out.WriteLine("                                                                  ");
-            Console.Out.WriteLine("                   CloudCoin Founders Edition                     ");
-            Console.Out.WriteLine("                      Version: July.05.2018                       ");
-            Console.Out.WriteLine("          Used to Authenticate, Store and Payout CloudCoins       ");
-            Console.Out.WriteLine("      This Software is provided as is with all faults, defects    ");
-            Console.Out.WriteLine("          and errors, and without warranty of any kind.           ");
-            Console.Out.WriteLine("                Free from the CloudCoin Consortium.               ");
+            updateLog("                   CloudCoin Founders Edition                     ");
+            updateLog("                      Version: July.05.2018                       ");
+            updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
+            updateLog("      This Software is provided as is with all faults, defects    ");
+            updateLog("          and errors, and without warranty of any kind.           ");
+            updateLog("                Free from the CloudCoin Consortium.               ");
             //Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
             Console.Out.WriteLine("                                                                  ");
 
@@ -629,13 +629,13 @@ CommandOption echo = commandLineApplication.Option(
                 {
                     break;
                 }
-                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
-                Console.Out.WriteLine("----------------------------------");
+                updateLog(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
+                updateLog("----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
-                Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+                updateLog("Ready Count - " + raida.ReadyCount);
+                updateLog("Not Ready Count - " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -652,9 +652,9 @@ CommandOption echo = commandLineApplication.Option(
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    updateLog(e.Message);
                 }
-                Console.Out.WriteLine("-----------------------------------\n");
+                updateLog("-----------------------------------\n");
             }
 
             Console.WriteLine();
@@ -671,23 +671,16 @@ CommandOption echo = commandLineApplication.Option(
 
         public async static Task EchoRaida()
         {
-            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
-            Console.Out.WriteLine("----------------------------------");
+            updateLog(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
+            updateLog("----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            updateLog("Ready Count -" + raida.ReadyCount);
-            updateLog("Not Ready Count -" + raida.NotReadyCount);
-            //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
-            //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
+            updateLog("Ready Count - " + raida.ReadyCount);
+            updateLog("Not Ready Count - " + raida.NotReadyCount);
 
-            //for (int i = 0; i < raida.nodes.Count(); i++)
-            //{
-            //    Debug.WriteLine("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-            //    //updateLog("Node" + i + " Status --" + raida.nodes[i].RAIDANodeStatus);
-            //}
-            Console.Out.WriteLine("-----------------------------------");
+            updateLog("-----------------------------------");
 
         }
 
@@ -870,7 +863,7 @@ CommandOption echo = commandLineApplication.Option(
                     }//end if file exists
 
                     FS.WriteCoinsToFile(exportCoins, filename, ".stack");
-                    Console.WriteLine("Coins exported as stack file to " + filename);
+                    updateLog("Coins exported as stack file to " + filename);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
                 }
@@ -883,7 +876,7 @@ CommandOption echo = commandLineApplication.Option(
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
                         FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-                        Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
+                        //Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
                     }
 
@@ -918,7 +911,7 @@ CommandOption echo = commandLineApplication.Option(
                     if (fileGenerated)
                     {
                         updateLog("CloudCoin Exported as Bar code to " + OutputFile);
-                        Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
+                        //Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
                     }
                 }
 
@@ -965,7 +958,7 @@ CommandOption echo = commandLineApplication.Option(
                 }
                 File.WriteAllText(filename , csv.ToString());
                 updateLog("Coins exported to "+ filename);
-                Console.WriteLine("Coins exported as csv to " + filename);
+                //Console.WriteLine("Coins exported as csv to " + filename);
                 //FS.WriteCoinsToFile(exportCoins, filename, ".s");
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
                 FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -1074,7 +1067,9 @@ CommandOption echo = commandLineApplication.Option(
 
         private static void Fix()
         {
-            if (FileSystem.frackedCoins.Count() > 0)
+            var frackedCoins = FS.LoadFolderCoins(FS.FrackedFolder);
+            
+            if (frackedCoins.Count() > 0)
             {
                 fixer.continueExecution = true;
                 fixer.IsFixing = true;
