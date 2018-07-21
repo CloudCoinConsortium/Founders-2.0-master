@@ -112,7 +112,7 @@ namespace CloudCoinCore
                 string[] values = csvLine.Split(',');
                 Debug.WriteLine(values[0]);
                 coin.sn = Convert.ToInt32(values[0]);
-                coin.nn = Convert.ToInt32(values[1]);
+                coin.nn = Convert.ToInt32(values[2]);
                 coin.denomination = Convert.ToInt16(values[1]);
                 coin.an = new List<string>();
                 for (int i = 0; i < Config.NodeCount; i++)
