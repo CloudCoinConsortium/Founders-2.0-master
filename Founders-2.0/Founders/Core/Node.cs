@@ -51,12 +51,12 @@ namespace CloudCoinCore
             Debug.WriteLine(FullUrl);
         }
 
-        public Node(int NodeNumber,RAIDANode node)
+        public Node(int NodeNumber, RAIDANode node)
         {
             this.NodeNumber = NodeNumber;
             this.node = node;
             FullUrl = GetFullURL();
-            FullUrl = "https://" +node.urls[0].url+"/service/";
+            FullUrl = "https://" + node.urls[0].url + "/service/";
             Debug.WriteLine(FullUrl);
         }
 
@@ -134,7 +134,7 @@ namespace CloudCoinCore
                 {
                     echoresult = JsonConvert.DeserializeObject<NodeEchoResponse>(echoResponse.fullResponse);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
 
                 }
@@ -350,7 +350,8 @@ namespace CloudCoinCore
                     }
                     else //404 not found or 500 error. 
                     {
-                        Debug.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                        RAIDA.logger.Error("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+
                         after = DateTime.Now;
                         ts = after.Subtract(before);//Start the timer
                         for (int i = 0; i < nn.Length; i++)
@@ -486,12 +487,12 @@ namespace CloudCoinCore
         //int[] nn, int[] sn, String[] an, String[] pan, int[] d, int timeout
         public async Task<MultiDetectResponse> MultiDetect()
         {
-            
+
             /*PREPARE REQUEST*/
             try
             {
 
-                var raida =RAIDA.ActiveRAIDA ;
+                var raida = RAIDA.ActiveRAIDA;
                 int[] nn = raida.multiRequest.nn;
                 int[] sn = raida.multiRequest.sn;
                 String[] an = raida.multiRequest.an[NodeNumber - 1];
@@ -553,7 +554,8 @@ namespace CloudCoinCore
                         }
                         else //404 not found or 500 error. 
                         {
-                            Console.Out.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                            //Console.Out.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                            RAIDA.logger.Error("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
                             after = DateTime.Now;
                             ts = after.Subtract(before);//Start the timer
                             for (int i = 0; i < nn.Length; i++)
@@ -708,7 +710,7 @@ namespace CloudCoinCore
                 //    }//end if array lengths are the same
 
                 //}//End Else not a dud
-                 //Break the respons into sub responses. 
+                //Break the respons into sub responses. 
                 MultiDetectTime = Convert.ToInt32(ts.Milliseconds);
                 MultiResponse.responses = response;
                 return MultiResponse;
