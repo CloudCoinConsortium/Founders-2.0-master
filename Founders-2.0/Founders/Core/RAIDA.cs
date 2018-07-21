@@ -165,11 +165,23 @@ namespace CloudCoinCore
             Console.WriteLine(message);
             logger.Info(message);
         }
+        private static void printStarLine()
+        {
+            logger.Info("****************************************************************************************************");
+            Console.Out.WriteLine("****************************************************************************************************");
+        }
 
-        public async static Task ProcessCoins(bool ChangeANs= true)
-        {                
+        public async static Task ProcessCoins(bool ChangeANs = true)
+        {
             var networks = (from x in IFileSystem.importCoins
                             select x.nn).Distinct().ToList();
+            printStarLine();
+            updateLog("Starting CloudCoin Import.");
+            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
+            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            printStarLine();
+            updateLog("Starting Detect..");
+            printStarLine();
             TimeSpan ts = new TimeSpan();
             DateTime before = DateTime.Now;
             DateTime after;
@@ -177,11 +189,11 @@ namespace CloudCoinCore
             foreach (var nn in networks)
             {
                 ActiveRAIDA = (from x in RAIDA.networks
-                                     where x.NetworkNumber == nn
-                                     select x).FirstOrDefault();
+                               where x.NetworkNumber == nn
+                               select x).FirstOrDefault();
                 int NetworkExists = (from x in RAIDA.networks
-                 where x.NetworkNumber == nn
-                 select x).Count();
+                                     where x.NetworkNumber == nn
+                                     select x).Count();
                 if (NetworkExists > 0)
                 {
                     updateLog("Starting Coins detection for Network " + nn);
@@ -194,11 +206,12 @@ namespace CloudCoinCore
 
             Debug.WriteLine("Detection Completed in : " + ts.TotalMilliseconds / 1000);
             updateLog("Detection Completed in : " + ts.TotalMilliseconds / 1000);
+            printStarLine();
         }
 
 
 
-        public async static Task ProcessNetworkCoins(int NetworkNumber, bool ChangeANS= true)
+        public async static Task ProcessNetworkCoins(int NetworkNumber, bool ChangeANS = true)
         {
             IFileSystem FS = FileSystem;
             FileSystem.LoadFileSystem();
@@ -231,11 +244,11 @@ namespace CloudCoinCore
                 {
                     raida.coins = coins;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
-                var tasks = raida.GetMultiDetectTasks(coins.ToArray(), Config.milliSecondsToTimeOut,ChangeANS);
+                var tasks = raida.GetMultiDetectTasks(coins.ToArray(), Config.milliSecondsToTimeOut, ChangeANS);
                 try
                 {
                     string requestFileName = Utils.RandomString(16).ToLower() + DateTime.Now.ToString("yyyyMMddHHmmss") + ".stack";
@@ -258,7 +271,7 @@ namespace CloudCoinCore
                         CoinCount++;
 
 
-                        updateLog("No. " + CoinCount + ". Coin Deteced. S. No. - " + coin.sn + ". Pass Count - " + coin.PassCount + ". Fail Count  - " + coin.FailCount + ". Result - " + coin.DetectionResult + "." + coin.pown);
+                        logger.Info("No. " + CoinCount + ". Coin Deteced. S. No. - " + coin.sn + ". Pass Count - " + coin.PassCount + ". Fail Count  - " + coin.FailCount + ". Result - " + coin.DetectionResult + "." + coin.pown);
                         Debug.WriteLine("Coin Deteced. S. No. - " + coin.sn + ". Pass Count - " + coin.PassCount + ". Fail Count  - " + coin.FailCount + ". Result - " + coin.DetectionResult);
                         //coin.sortToFolder();
                         pge.MinorProgress = (CoinCount) * 100 / totalCoinCount;
@@ -270,7 +283,7 @@ namespace CloudCoinCore
                     pge.MinorProgress = (CoinCount - 1) * 100 / totalCoinCount;
                     Debug.WriteLine("Minor Progress- " + pge.MinorProgress);
                     raida.OnProgressChanged(pge);
-                    FS.WriteCoin(coins, FS.DetectedFolder,false);
+                    FS.WriteCoin(coins, FS.DetectedFolder, false);
                     FS.RemoveCoins(coins, FS.PreDetectFolder);
 
                     updateLog(pge.MinorProgress + " % of Coins on Network " + NetworkNumber + " processed.");
@@ -289,20 +302,22 @@ namespace CloudCoinCore
             raida.OnProgressChanged(pge);
             var detectedCoins = FS.LoadFolderCoins(FS.DetectedFolder);
             //detectedCoins.ForEach(x => x.pown= "ppppppppppppppppppppppppp");
+            updateLog("  Detection finished.");
+            printStarLine();
 
             // Apply Sort to Folder to all detected coins at once.
-            updateLog("Starting Sort.....");
+            updateLog("  Starting Grading Coins..");
             //detectedCoins.ForEach(x => x.doPostProcessing());
             detectedCoins.ForEach(x => x.SortToFolder());
-            updateLog("Ended Sort........");
+            updateLog("  Grading Coins Completed.");
 
             var passedCoins = (from x in detectedCoins
                                where x.folder == FS.BankFolder
                                select x).ToList();
 
             var frackedCoins = (from x in detectedCoins
-                               where x.folder == FS.FrackedFolder
-                               select x).ToList();
+                                where x.folder == FS.FrackedFolder
+                                select x).ToList();
 
             var failedCoins = (from x in detectedCoins
                                where x.folder == FS.CounterfeitFolder
@@ -314,19 +329,27 @@ namespace CloudCoinCore
                                 where x.folder == FS.SuspectFolder
                                 select x).ToList();
 
-            Debug.WriteLine("Total Passed Coins - " + (passedCoins.Count()+ frackedCoins.Count()));
+            var dangerousCoins = (from x in detectedCoins
+                                  where x.folder == FS.DangerousFolder
+                                  select x).ToList();
+
+            Debug.WriteLine("Total Passed Coins - " + (passedCoins.Count() + frackedCoins.Count()));
             Debug.WriteLine("Total Failed Coins - " + failedCoins.Count());
+            updateLog("Detection and Import of the CloudCoins completed.");
+
             updateLog("Coin Detection finished.");
-            updateLog("Total Passed Coins - " + (passedCoins.Count() + frackedCoins.Count()) + "");
-            updateLog("Total Failed Coins - " + failedCoins.Count() + "");
-            updateLog("Total Lost Coins - " + lostCoins.Count() + "");
-            updateLog("Total Suspect Coins - " + suspectCoins.Count() + "");
+            updateLog("  Total Passed Coins - " + (passedCoins.Count() + frackedCoins.Count()) + "");
+            updateLog("  Total Counterfeit Coins - " + failedCoins.Count() + "");
+            updateLog("  Total Lost Coins - " + lostCoins.Count() + "");
+            updateLog("  Total Suspect Coins - " + suspectCoins.Count() + "");
+            updateLog("  Total Dangerous Coins - " + dangerousCoins.Count() + "");
+
 
             // Move Coins to their respective folders after sort
             FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder);
             FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder);
 
-            FS.WriteCoin(failedCoins, FS.CounterfeitFolder,false, true);
+            FS.WriteCoin(failedCoins, FS.CounterfeitFolder, false, true);
             FS.MoveCoins(lostCoins, FS.DetectedFolder, FS.LostFolder);
             FS.MoveCoins(suspectCoins, FS.DetectedFolder, FS.SuspectFolder);
 

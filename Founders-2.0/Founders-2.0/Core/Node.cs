@@ -350,7 +350,8 @@ namespace CloudCoinCore
                     }
                     else //404 not found or 500 error. 
                     {
-                        Debug.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                        RAIDA.logger.Error("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                        
                         after = DateTime.Now;
                         ts = after.Subtract(before);//Start the timer
                         for (int i = 0; i < nn.Length; i++)
@@ -553,7 +554,8 @@ namespace CloudCoinCore
                         }
                         else //404 not found or 500 error. 
                         {
-                            Console.Out.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                            //Console.Out.WriteLine("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
+                            RAIDA.logger.Error("RAIDA " + NodeNumber + " had an error: " + json.StatusCode);
                             after = DateTime.Now;
                             ts = after.Subtract(before);//Start the timer
                             for (int i = 0; i < nn.Length; i++)

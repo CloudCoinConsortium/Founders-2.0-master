@@ -230,6 +230,7 @@ namespace Founders
                 FS.LoadFileSystem();
 
                 RAIDA.logger = logger;
+                //RAIDA.node.ForEach(x=>x.net)
                 fixer = new Frack_Fixer(FS, Config.milliSecondsToTimeOut);
                 raida = RAIDA.GetInstance();
                 raida.LoggerHandler += Raida_LoggerHandler;
