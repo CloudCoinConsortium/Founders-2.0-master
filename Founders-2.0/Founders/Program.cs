@@ -16,6 +16,7 @@ using CloudCoinClient.CoreClasses;
 using McMaster.Extensions.CommandLineUtils;
 using ConsoleTables;
 using System.Text;
+using System.Globalization;
 
 namespace Founders
 {
@@ -447,21 +448,26 @@ CommandOption echo = commandLineApplication.Option(
             switch (input)
             {
                 case 1:
+                    logger.Info("User Input : 1 Echo");
                     await EchoRaidas();
                     break;
                 case 2:
+                    logger.Info("User Input : 2 Show Coins");
                     showCoins();
                     break;
                 case 3:
+                    logger.Info("User Input : 3 Deposit");
                     //await detect();
                     FS.LoadFileSystem();
                     await RAIDA.ProcessCoins(true);
                     break;
                 case 4:
+                    logger.Info("User Input : 4 Withdraw");
                     ExportCoins();
                     //export();
                     break;
                 case 6:
+                    logger.Info("User Input : 6 Show Folders ");
                     try
                     {
                         Process.Start(FS.RootPath);
@@ -473,19 +479,24 @@ CommandOption echo = commandLineApplication.Option(
                     ShowFolders();
                     break;
                 case 5:
+                    logger.Info("User Input : 5 Synchronize");
                     Fix();
                     //fix(timeout);
                     break;
                 case 7:
+                    logger.Info("User Input : 7 Backup");
                     Backup();
                     break;
                 case 8:
+                    logger.Info("User Input : 8 List Serials");
                     ListSerials();
                     break;
                 case 9:
+                    logger.Info("User Input : 9 Help");
                     help();
                     break;
                 case 10:
+                    logger.Info("User Input : 10 Exit");
                     break;
                 case 11:
                     break;
@@ -498,6 +509,7 @@ CommandOption echo = commandLineApplication.Option(
         {
             Console.Write("Enter Source Location: ");
             string sourceLocation = reader.readString();
+            logger.Info("User Input : Source Location " + sourceLocation);
             if(!Directory.Exists(sourceLocation))
             {
                 Console.WriteLine("Folder does not exist.");
@@ -505,6 +517,8 @@ CommandOption echo = commandLineApplication.Option(
             }
             Console.Write("Enter Target Folder Location: ");
             string targetLocation = reader.readString();
+            logger.Info("User Input : Target Location " + targetLocation);
+
             if (!Directory.Exists(targetLocation))
             {
                 Console.WriteLine("Folder does not exist.");
@@ -749,11 +763,14 @@ CommandOption echo = commandLineApplication.Option(
             CalculateTotals();
             Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
             int file_type = reader.readInt(1, 5);
+            logger.Info("User Input : Export Type" + file_type);
+
             int stack_type = 1;
             if (file_type == 2)
             {
                 Console.WriteLine("Export All Coins to Single Stack (1) or One Stack per coin (2)?");
                 stack_type = reader.readInt(1, 2);
+                logger.Info("User Input : " + stack_type);
             }
 
             int exp_1 = 0;
@@ -766,6 +783,7 @@ CommandOption echo = commandLineApplication.Option(
             {
                 Console.Out.WriteLine("  How many 1s do you want to export?");
                 exp_1 = reader.readInt(0, (onesTotalCount));
+                logger.Info("User Input : 1s To Export"+ exp_1);
             }
 
             // if 1s not zero 
@@ -773,6 +791,7 @@ CommandOption echo = commandLineApplication.Option(
             {
                 Console.Out.WriteLine("  How many 5s do you want to export?");
                 exp_5 = reader.readInt(0, (fivesTotalCount));
+                logger.Info("User Input : 5s To Export" + exp_5);
             }
 
             // if 1s not zero 
@@ -780,6 +799,7 @@ CommandOption echo = commandLineApplication.Option(
             {
                 Console.Out.WriteLine("  How many 25s do you want to export?");
                 exp_25 = reader.readInt(0, (qtrTotalCount));
+                logger.Info("User Input : 25s To Export" + exp_25);
             }
 
             // if 1s not zero 
@@ -787,6 +807,8 @@ CommandOption echo = commandLineApplication.Option(
             {
                 Console.Out.WriteLine("  How many 100s do you want to export?");
                 exp_100 = reader.readInt(0, (hundredsTotalCount));
+                logger.Info("User Input : 100s To Export" + exp_100);
+
             }
 
             // if 1s not zero 
@@ -794,10 +816,13 @@ CommandOption echo = commandLineApplication.Option(
             {
                 Console.Out.WriteLine("  How many 250s do you want to export?");
                 exp_250 = reader.readInt(0, (twoFiftiesTotalCount));
+                logger.Info("User Input : 250s To Export" + exp_250);
+
             }
 
             Console.Out.WriteLine("  What tag will you add to the file name?");
             String tag = reader.readString();
+            logger.Info("User Input : 1s Tag" + tag);
 
             int totalSaved = exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250);
             List<CloudCoin> totalCoins = IFileSystem.bankCoins.ToList();
@@ -858,6 +883,14 @@ CommandOption echo = commandLineApplication.Option(
                 foreach (var coin in exportCoins)
                 {
                     string OutputFile = FS.ExportFolder + coin.FileName + tag + ".jpg";
+                    if (File.Exists(OutputFile))
+                    {
+                        // tack on a random number if a file already exists with the same tag
+                        Random rnd = new Random();
+                        int tagrand = rnd.Next(999);
+                        OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "." + tagrand + "");
+                    }//end if file exists
+
                     bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
                     if (fileGenerated)
                     {
@@ -881,6 +914,8 @@ CommandOption echo = commandLineApplication.Option(
                         // tack on a random number if a file already exists with the same tag
                         Random rnd = new Random();
                         int tagrand = rnd.Next(999);
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+                                            CultureInfo.InvariantCulture);
                         filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
                     }//end if file exists
 
@@ -893,8 +928,9 @@ CommandOption echo = commandLineApplication.Option(
                 {
                     foreach (var coin in exportCoins)
                     {
-                        string OutputFile = FS.ExportFolder + coin.FileName + tag + ".stack";
-                        FS.WriteCoinToFile(coin, OutputFile);
+                        string OutputFile = FS.ExportFolder + coin.FileName + "."+ tag + ".stack";
+                        //FS.WriteCoinToFile(coin, OutputFile);
+                        FS.ExportCoinToFile(coin, OutputFile);
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
                         FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -910,7 +946,15 @@ CommandOption echo = commandLineApplication.Option(
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr." + tag + ".jpg";
+                    if (File.Exists(OutputFile))
+                    {
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+CultureInfo.InvariantCulture);
+                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
+
+                    }
+
                     bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
@@ -928,7 +972,14 @@ CommandOption echo = commandLineApplication.Option(
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + ".jpg";
+                    if (File.Exists(OutputFile))
+                    {
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+CultureInfo.InvariantCulture);
+                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
+
+                    }
                     bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
@@ -948,7 +999,10 @@ CommandOption echo = commandLineApplication.Option(
                     // tack on a random number if a file already exists with the same tag
                     Random rnd = new Random();
                     int tagrand = rnd.Next(999);
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                    string timestamp = DateTime.UtcNow.ToString("mmssfff",
+                    CultureInfo.InvariantCulture);
+
+                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + timestamp + ".csv");
 
 
                 }//end if file exists

@@ -163,6 +163,7 @@
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\ConsoleTable.cs" />
     <Compile Include="Utils\EchoResponse.cs" />
+    <Compile Include="Utils\ExportStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

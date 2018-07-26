@@ -408,7 +408,9 @@ namespace CloudCoinClient.CoreClasses
                     Margin = margin
                 }
             };
-            string coinJson = JsonConvert.SerializeObject(cloudCoin);
+            Founders.Utils.CloudCoin exportCoin = new Founders.Utils.CloudCoin(cloudCoin);
+            string coinJson = JsonConvert.SerializeObject(exportCoin);
+
             var pixelData = qrCodeWriter.Write(coinJson);
             // creating a bitmap from the raw pixel data; if only black and white colors are used it makes no difference   
             // that the pixel data ist BGRA oriented and the bitmap is initialized with RGB   
@@ -442,7 +444,10 @@ namespace CloudCoinClient.CoreClasses
                 Options = new EncodingOptions { Width = 200, Height = 50 } //optional
             };
             cloudCoin.pan = null;
-            var coinJson = JsonConvert.SerializeObject(cloudCoin);
+
+            Founders.Utils.CloudCoin exportCoin = new Founders.Utils.CloudCoin(cloudCoin);
+
+            var coinJson = JsonConvert.SerializeObject(exportCoin);
             var imgBitmap = writer.Write(coinJson);
             using (var stream = new MemoryStream())
             {

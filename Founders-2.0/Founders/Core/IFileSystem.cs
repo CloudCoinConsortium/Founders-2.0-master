@@ -12,6 +12,7 @@ using QRCoder;
 
 using System.Drawing;
 using ZXing;
+using Founders.Utils;
 
 namespace CloudCoinCore
 {
@@ -228,6 +229,7 @@ namespace CloudCoinCore
                 string decoded = result.ToString().Trim();
 
                 CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+                bitmap.Dispose();
                 return cloudCoin;
             }
             catch (Exception)
@@ -249,6 +251,7 @@ namespace CloudCoinCore
                 string decoded = barcodeResult.ToString().Trim();
 
                 CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+                bitmap.Dispose();
                 return cloudCoin;
             }
             catch (Exception)
@@ -313,7 +316,7 @@ namespace CloudCoinCore
 
                 //   Console.Out.WriteLine("Loaded coin filename: " + tempCoin.fileName);
 
-                writeTo(SuspectFolder, tempCoin);
+                //writeTo(SuspectFolder, tempCoin);
                 return tempCoin;
             }
             catch (FileNotFoundException ex)
@@ -614,12 +617,27 @@ namespace CloudCoinCore
             }
         }
 
+        public void ExportCoinsToFile(IEnumerable<CloudCoin> coins, string fileName, string extension = ".stack")
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            Stack stack = new Stack(coins.ToArray());
+            using (StreamWriter sw = new StreamWriter(fileName + extension))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, stack);
+            }
+        }
+
+
         public void WriteCoinsToFile(IEnumerable<CloudCoin> coins, string fileName, string extension = ".stack")
         {
             JsonSerializer serializer = new JsonSerializer();
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coins.ToArray());
+
             using (StreamWriter sw = new StreamWriter(fileName + extension))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
@@ -658,10 +676,29 @@ namespace CloudCoinCore
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coin);
+            
             using (StreamWriter sw = new StreamWriter(filename))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 serializer.Serialize(writer, stack);
+            }
+        }
+
+        public void ExportCoinToFile(CloudCoin coin, string filename)
+        {
+
+
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            Stack stack = new Stack(coin);
+
+            ExportStack exportStack = new ExportStack(stack);
+
+            using (StreamWriter sw = new StreamWriter(filename))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, exportStack);
             }
         }
 
