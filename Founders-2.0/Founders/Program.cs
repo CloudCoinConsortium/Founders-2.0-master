@@ -871,26 +871,29 @@ CommandOption echo = commandLineApplication.Option(
             // Export Coins as jPeg Images
             if (file_type == 1)
             {
-                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
-                if (File.Exists(filename))
-                {
-                    // tack on a random number if a file already exists with the same tag
-                    Random rnd = new Random();
-                    int tagrand = rnd.Next(999);
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
-                }//end if file exists
+                //String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
+                //if (File.Exists(filename))
+                //{
+                //    // tack on a random number if a file already exists with the same tag
+                //    Random rnd = new Random();
+                //    int tagrand = rnd.Next(999);
+                //    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                //}//end if file exists
 
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + "." + tag + ".jpg";
                     if (File.Exists(OutputFile))
                     {
                         // tack on a random number if a file already exists with the same tag
                         Random rnd = new Random();
                         int tagrand = rnd.Next(999);
-                        OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "." + tagrand + "");
-                    }//end if file exists
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+                    CultureInfo.InvariantCulture);
 
+                        OutputFile = FS.ExportFolder + coin.FileName + "." + tag +timestamp + ".jpg";
+                    }//end if file exists
+                    OutputFile = OutputFile.Replace("..",".");
                     bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
                     if (fileGenerated)
                     {
@@ -908,19 +911,21 @@ CommandOption echo = commandLineApplication.Option(
             {
                 if (stack_type == 1)
                 {
-                    String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
-                    if (File.Exists(filename))
+                    String OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
+                    if (File.Exists(OutputFile + ".stack"))
                     {
                         // tack on a random number if a file already exists with the same tag
                         Random rnd = new Random();
                         int tagrand = rnd.Next(999);
                         string timestamp = DateTime.UtcNow.ToString("mmssfff",
                                             CultureInfo.InvariantCulture);
-                        filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                        OutputFile = OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + timestamp + "");
                     }//end if file exists
 
-                    FS.WriteCoinsToFile(exportCoins, filename, ".stack");
-                    updateLog("Coins exported as stack file to " + filename);
+                    OutputFile.Replace("..", ".");
+
+                    FS.WriteCoinsToFile(exportCoins, OutputFile, ".stack");
+                    updateLog("Coins exported as stack file to " + OutputFile);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
                 }
@@ -930,6 +935,15 @@ CommandOption echo = commandLineApplication.Option(
                     {
                         string OutputFile = FS.ExportFolder + coin.FileName + "."+ tag + ".stack";
                         //FS.WriteCoinToFile(coin, OutputFile);
+                        if (File.Exists(OutputFile.Replace("..",".")))
+                        {
+                            string timestamp = DateTime.UtcNow.ToString("mmssfff",
+    CultureInfo.InvariantCulture);
+                            OutputFile = FS.ExportFolder + coin.FileName + "." + tag + timestamp + ".stack";
+
+                        }
+
+                        OutputFile = OutputFile.Replace("..", ".");
                         FS.ExportCoinToFile(coin, OutputFile);
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
@@ -947,13 +961,14 @@ CommandOption echo = commandLineApplication.Option(
                 foreach (var coin in exportCoins)
                 {
                     string OutputFile = FS.ExportFolder + coin.FileName + ".qr." + tag + ".jpg";
-                    if (File.Exists(OutputFile))
+                    if (File.Exists(OutputFile.Replace("..", ".")))
                     {
                         string timestamp = DateTime.UtcNow.ToString("mmssfff",
 CultureInfo.InvariantCulture);
                         OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
 
                     }
+                    OutputFile = OutputFile.Replace("..", ".");
 
                     bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
                     if (fileGenerated)
@@ -973,13 +988,15 @@ CultureInfo.InvariantCulture);
                 foreach (var coin in exportCoins)
                 {
                     string OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + ".jpg";
-                    if (File.Exists(OutputFile))
+                    if (File.Exists(OutputFile.Replace("..", ".")))
                     {
                         string timestamp = DateTime.UtcNow.ToString("mmssfff",
 CultureInfo.InvariantCulture);
                         OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
 
                     }
+                    OutputFile = OutputFile.Replace("..", ".");
+
                     bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
@@ -993,8 +1010,8 @@ CultureInfo.InvariantCulture);
             }
             if (file_type == 5)
             {
-                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + ".csv");
-                if (File.Exists(filename))
+                String OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + ".csv");
+                if (File.Exists(OutputFile.Replace("..", ".")))
                 {
                     // tack on a random number if a file already exists with the same tag
                     Random rnd = new Random();
@@ -1002,10 +1019,12 @@ CultureInfo.InvariantCulture);
                     string timestamp = DateTime.UtcNow.ToString("mmssfff",
                     CultureInfo.InvariantCulture);
 
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + timestamp + ".csv");
+                    OutputFile = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + timestamp + ".csv");
 
 
                 }//end if file exists
+
+                OutputFile = OutputFile.Replace("..", ".");
 
                 var csv = new StringBuilder();
                 var coins = exportCoins;
@@ -1032,8 +1051,8 @@ CultureInfo.InvariantCulture);
                     csv.AppendLine(newLine);
 
                 }
-                File.WriteAllText(filename, csv.ToString());
-                updateLog("Coins exported to " + filename);
+                File.WriteAllText(OutputFile, csv.ToString());
+                updateLog("Coins exported to " + OutputFile);
                 //Console.WriteLine("Coins exported as csv to " + filename);
                 //FS.WriteCoinsToFile(exportCoins, filename, ".s");
                 FS.RemoveCoins(exportCoins, FS.BankFolder);
