@@ -62,10 +62,10 @@ namespace Founders
             Console.WriteLine("2. Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
             Console.WriteLine("3. Deposit (Authenticate, Pown (Password own) and Import Coins Into Your Bank Folder)");
             Console.WriteLine("4. Withdraw (Export Coins From Your Bank Folder)");
-            Console.WriteLine("5. Synchronize Coins (Heal Coins That Some RAIDA think are Fake)");
+            Console.WriteLine("5. Fix Fracked (Heal Coins That Some RAIDA think are Fake)");
             Console.WriteLine("6. Show Folders (Show the location of your Bank Folder)");
-            Console.WriteLine("7. Backup");
-            Console.WriteLine("8. List Coin Serials");
+            Console.WriteLine("7. Backup (Backup all coins stored in Bank and Fracked folder into *.stack file)");
+            Console.WriteLine("8. List Serials (Create CSV file with serial numbers of all coins stored in selected folder)");
             Console.WriteLine("9. Help ( CloudCoin.HelpDesk@Protonmail.com )");
             //            Console.WriteLine("8. Switch Network");
             //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
