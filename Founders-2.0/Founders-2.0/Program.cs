@@ -16,6 +16,7 @@ using CloudCoinClient.CoreClasses;
 using McMaster.Extensions.CommandLineUtils;
 using ConsoleTables;
 using System.Text;
+using System.Globalization;
 
 namespace Founders
 {
@@ -57,7 +58,7 @@ namespace Founders
         {
             //Console.WriteLine("Your TA (Temporary Address): " + tts.secretWord);
             //Console.WriteLine("Give your TA to people who want to send you CloudCoins via Trusted Transfer");
-            Console.WriteLine();
+            //Console.WriteLine();
             Console.WriteLine("1. Echo RAIDA (Check your connection to the Counterfeit Detection System)");
             Console.WriteLine("2. Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
             Console.WriteLine("3. Deposit (Authenticate, Pown (Password own) and Import Coins Into Your Bank Folder)");
@@ -66,7 +67,7 @@ namespace Founders
             Console.WriteLine("6. Show Folders (Show the location of your Bank Folder)");
             Console.WriteLine("7. Backup (Backup all coins stored in Bank and Fracked folder into *.stack file)");
             Console.WriteLine("8. List Serials (Create CSV file with serial numbers of all coins stored in selected folder)");
-            Console.WriteLine("9. Help ( CloudCoin.HelpDesk@Protonmail.com )");
+            Console.WriteLine("9. Help ( CloudCoinSupport@Protonmail.com )");
             //            Console.WriteLine("8. Switch Network");
             //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
             Console.WriteLine("10. Exit");
@@ -448,21 +449,26 @@ namespace Founders
             switch (input)
             {
                 case 1:
+                    logger.Info("User Input : 1 Echo");
                     await EchoRaidas();
                     break;
                 case 2:
+                    logger.Info("User Input : 2 Show Coins");
                     showCoins();
                     break;
                 case 3:
+                    logger.Info("User Input : 3 Deposit");
                     //await detect();
                     FS.LoadFileSystem();
                     await RAIDA.ProcessCoins(true);
                     break;
                 case 4:
+                    logger.Info("User Input : 4 Withdraw");
                     ExportCoins();
                     //export();
                     break;
                 case 6:
+                    logger.Info("User Input : 6 Show Folders ");
                     try
                     {
                         Process.Start(FS.RootPath);
@@ -474,19 +480,24 @@ namespace Founders
                     ShowFolders();
                     break;
                 case 5:
+                    logger.Info("User Input : 5 Synchronize");
                     Fix();
                     //fix(timeout);
                     break;
                 case 7:
+                    logger.Info("User Input : 7 Backup");
                     Backup();
                     break;
                 case 8:
+                    logger.Info("User Input : 8 List Serials");
                     ListSerials();
                     break;
                 case 9:
+                    logger.Info("User Input : 9 Help");
                     help();
                     break;
                 case 10:
+                    logger.Info("User Input : 10 Exit");
                     break;
                 case 11:
                     break;
@@ -544,7 +555,7 @@ namespace Founders
                 csv.AppendLine(newLine);
 
             }
-            string filename = TargetLocation + Path.DirectorySeparatorChar + "CoinSerials" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower() + ".csv";
+            string filename = TargetLocation + Path.DirectorySeparatorChar + "CoinSerials-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower() + ".csv";
             File.WriteAllText(filename, csv.ToString());
         }
         public static void Backup()
@@ -564,7 +575,7 @@ namespace Founders
                     updateLog("No Coins available for backup.");
                     return;
                 }
-                string FileName = TargetLocation + Path.DirectorySeparatorChar + "CloudCoinsBackup" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower();
+                string FileName = TargetLocation + Path.DirectorySeparatorChar + "CloudCoinsBackup-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower();
                 FS.WriteCoinsToFile(bankCoins, FileName, ".stack");
                 Console.WriteLine("CloudCoins Backup successful");
             }
@@ -612,9 +623,9 @@ namespace Founders
             Console.Out.WriteLine("");
             Console.Out.WriteLine("Customer Service:");
             Console.Out.WriteLine("Open 9am to 11pm California Time(PST).");
-            Console.Out.WriteLine("1 (530) 500 - 2646");
-            Console.Out.WriteLine("CloudCoin.HelpDesk@gmail.com(unsecure)");
-            Console.Out.WriteLine("CloudCoin.HelpDesk@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
+            //Console.Out.WriteLine("");//Change to 1 (530) 762-1361 when active old number:1 (530) 500 - 2646
+            Console.Out.WriteLine("CloudCoinHelp@gmail.com(unsecure)");
+            Console.Out.WriteLine("CloudCoinSupport@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
 
         }//End Help
 
@@ -649,16 +660,17 @@ namespace Founders
                             table.AddRow("RAIDA " + i, network.nodes[i].RAIDANodeStatus == NodeStatus.Ready ? "Ready" : "Not Ready", "", "", "");
                     }
 
-                    table.Write();
+                    //table.Write();
+                    logger.Info(table.ToString());
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
-                Console.Out.WriteLine("-----------------------------------\n");
+                Console.Out.WriteLine("-----------------------------------");
             }
 
-            Console.WriteLine();
+            //Console.WriteLine();
 
             //var rows = Enumerable.Repeat(new Something(), 10);
 
@@ -759,8 +771,9 @@ namespace Founders
             int stack_type = 1;
             if (file_type == 2)
             {
-                Console.WriteLine("Export All Coins to Single Stack (1) or One Stack per coin (2)?");
+                Console.WriteLine("Export All Coins to Single Stack (1) or One Coin per Stack (2)?");
                 stack_type = reader.readInt(1, 2);
+                logger.Info("User Input : " + stack_type);
             }
 
             int exp_1 = 0;
@@ -773,6 +786,7 @@ namespace Founders
             {
                 Console.Out.WriteLine("  How many 1s do you want to export?");
                 exp_1 = reader.readInt(0, (onesTotalCount));
+                logger.Info("User Input : 1s To Export" + exp_1);
             }
 
             // if 1s not zero 
@@ -780,6 +794,7 @@ namespace Founders
             {
                 Console.Out.WriteLine("  How many 5s do you want to export?");
                 exp_5 = reader.readInt(0, (fivesTotalCount));
+                logger.Info("User Input : 5s To Export" + exp_5);
             }
 
             // if 1s not zero 
@@ -787,6 +802,7 @@ namespace Founders
             {
                 Console.Out.WriteLine("  How many 25s do you want to export?");
                 exp_25 = reader.readInt(0, (qtrTotalCount));
+                logger.Info("User Input : 25s To Export" + exp_25);
             }
 
             // if 1s not zero 
@@ -794,6 +810,7 @@ namespace Founders
             {
                 Console.Out.WriteLine("  How many 100s do you want to export?");
                 exp_100 = reader.readInt(0, (hundredsTotalCount));
+                logger.Info("User Input : 100s To Export" + exp_100);
             }
 
             // if 1s not zero 
@@ -801,12 +818,19 @@ namespace Founders
             {
                 Console.Out.WriteLine("  How many 250s do you want to export?");
                 exp_250 = reader.readInt(0, (twoFiftiesTotalCount));
+                logger.Info("User Input : 250s To Export" + exp_250);
             }
 
             Console.Out.WriteLine("  What tag will you add to the file name?");
             String tag = reader.readString();
+            logger.Info("User Input : 1s Tag" + tag);
 
             int totalSaved = exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250);
+            if (totalSaved == 0)
+            {
+                Console.WriteLine("You have no coins to export.");
+                return;
+            }
             List<CloudCoin> totalCoins = IFileSystem.bankCoins.ToList();
             totalCoins.AddRange(IFileSystem.frackedCoins);
 
@@ -851,15 +875,17 @@ namespace Founders
                 printStarLine();
             }
             // Export Coins as jPeg Images
+            int existingFilename = 0;
             if (file_type == 1)
             {
-                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
-                if (File.Exists(filename))
+                String filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + "");
+                while (File.Exists(filename))
                 {
                     // tack on a random number if a file already exists with the same tag
-                    Random rnd = new Random();
-                    int tagrand = rnd.Next(999);
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                    //Random rnd = new Random();
+                    //int tagrand = rnd.Next(999);
+                    existingFilename++;
+                    filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + "."+ existingFilename + "");
                 }//end if file exists
 
                 foreach (var coin in exportCoins)
@@ -882,13 +908,14 @@ namespace Founders
             {
                 if (stack_type == 1)
                 {
-                    String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + "");
-                    if (File.Exists(filename))
+                    String filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "");
+                    while (File.Exists(filename))
                     {
                         // tack on a random number if a file already exists with the same tag
-                        Random rnd = new Random();
-                        int tagrand = rnd.Next(999);
-                        filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                        //Random rnd = new Random();
+                        //int tagrand = rnd.Next(999);
+                        existingFilename++;
+                        filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
                     }//end if file exists
 
                     FS.WriteCoinsToFile(exportCoins, filename, ".stack");
@@ -949,13 +976,14 @@ namespace Founders
             }
             if (file_type == 5)
             {
-                String filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + ".csv");
-                if (File.Exists(filename))
+                String filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + ".csv");
+                while (File.Exists(filename))
                 {
                     // tack on a random number if a file already exists with the same tag
-                    Random rnd = new Random();
-                    int tagrand = rnd.Next(999);
-                    filename = (FS.ExportFolder + Path.DirectorySeparatorChar + totalSaved + ".CloudCoins." + tag + tagrand + "");
+                    //Random rnd = new Random();
+                    //int tagrand = rnd.Next(999);
+                    existingFilename++;
+                    filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
 
 
                 }//end if file exists
@@ -1195,7 +1223,7 @@ namespace Founders
             }
             Exporter exporter = new Exporter(FS);
             exporter.writeJSONFile(exp_1, exp_5, exp_25, exp_100, exp_250, "TrustedTrade");
-            string path = FS.ExportFolder + Path.DirectorySeparatorChar + total + ".CloudCoins.TrustedTrade.stack";
+            string path = FS.ExportFolder  + total + ".CloudCoins.TrustedTrade.stack";
             Console.Out.WriteLine("Sending " + path);
             string stack = File.ReadAllText(path);
             await tts.SendCoins(word, stack);

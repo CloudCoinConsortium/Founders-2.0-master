@@ -14,6 +14,7 @@ using ZXing.PDF417;
 using ZXing;
 using ZXing.Common;
 using System.Drawing.Imaging;
+using SkiaSharp;
 
 namespace CloudCoinClient.CoreClasses
 {
@@ -41,10 +42,9 @@ namespace CloudCoinClient.CoreClasses
             RequestsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_REQUESTS + Path.DirectorySeparatorChar;
             DangerousFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_DANGEROUS + Path.DirectorySeparatorChar;
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
-            ResponseFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_RESPONSE + Path.DirectorySeparatorChar;
-            QRFolder = ImportFolder + Config.TAG_QR;
-            BarCodeFolder = ImportFolder + Config.TAG_BARCODE;
-            CSVFolder = ImportFolder + Config.TAG_CSV;
+            QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
+            BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
+            CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
 
         }
         public override bool CreateFolderStructure()
@@ -94,8 +94,7 @@ namespace CloudCoinClient.CoreClasses
                 Directory.CreateDirectory(LogsFolder);
                 Directory.CreateDirectory(QRFolder);
                 Directory.CreateDirectory(BarCodeFolder);
-                //Directory.CreateDirectory(CSVFolder);
-                Directory.CreateDirectory(ResponseFolder);
+                Directory.CreateDirectory(CSVFolder);
 
             }
             catch (Exception e)
@@ -113,15 +112,15 @@ namespace CloudCoinClient.CoreClasses
         public override void LoadFileSystem()
         {
             importCoins = LoadFolderCoins(ImportFolder);
-            //var csvCoins = LoadCoinsByFormat(ImportFolder +Path.DirectorySeparatorChar + "CSV", Formats.CSV);
+            var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
             var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
             var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
 
             // Add Additional File formats if present
             //importCoins = importCoins.Concat(csvCoins);
-            importCoins =  importCoins.Concat(BarCodeCoins);
+            importCoins = importCoins.Concat(BarCodeCoins);
             importCoins = importCoins.Concat(qrCoins);
-            
+
             Debug.WriteLine("Count -" + importCoins.Count());
 
             //exportCoins = LoadFolderCoins(ExportFolder);
@@ -189,7 +188,7 @@ namespace CloudCoinClient.CoreClasses
         {
             return CoinName;
         }
-        public void TransferCoins(IEnumerable<CloudCoin> coins, string sourceFolder, string targetFolder,string extension = ".stack")
+        public void TransferCoins(IEnumerable<CloudCoin> coins, string sourceFolder, string targetFolder, string extension = ".stack")
         {
             var folderCoins = LoadFolderCoins(targetFolder);
 
@@ -242,7 +241,7 @@ namespace CloudCoinClient.CoreClasses
 
         }
 
-        public bool WriteTextFile(string fileName,string text)
+        public bool WriteTextFile(string fileName, string text)
         {
             try
             {
@@ -251,9 +250,9 @@ namespace CloudCoinClient.CoreClasses
                 OurStream.Write(text);
                 OurStream.Close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-               // MainWindow.logger.Error(e.Message);
+                // MainWindow.logger.Error(e.Message);
                 return false;
             }
             return true;
@@ -344,33 +343,47 @@ namespace CloudCoinClient.CoreClasses
 
             /* READ JPEG TEMPLATE*/
             byte[] jpegBytes = null;
+            switch (cloudCoin.getDenomination())
+            {
+                case 1: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg1.jpg"); break;
+                case 5: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg5.jpg"); break;
+                case 25: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg25.jpg"); break;
+                case 100: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg100.jpg"); break;
+                case 250: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg250.jpg"); break;
+            }// end switch
 
-            //jpegBytes = readAllBytes(filePath);
-            jpegBytes = File.ReadAllBytes(TemplateFile);
 
             /* WRITE THE SERIAL NUMBER ON THE JPEG */
 
             //Bitmap bitmapimage;
-            //jpegBytes = readAllBytes(filePath);
-            jpegBytes = File.ReadAllBytes(TemplateFile);
-
-            /* WRITE THE SERIAL NUMBER ON THE JPEG */
-
-            Bitmap bitmapimage;
-
-            using (var ms = new MemoryStream(jpegBytes))
+            SKBitmap bitmapimage;
+            //using (var ms = new MemoryStream(jpegBytes))
             {
-                bitmapimage = new Bitmap(ms);
+
+                //bitmapimage = new Bitmap(ms);
+                bitmapimage = SKBitmap.Decode(jpegBytes);
             }
+            SKCanvas canvas = new SKCanvas(bitmapimage);
+            //Graphics graphics = Graphics.FromImage(bitmapimage);
+            //graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            //graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            SKPaint textPaint = new SKPaint()
+            {
+                IsAntialias = true,
+                Color = SKColors.White,
+                TextSize = 14,
+                Typeface = SKTypeface.FromFamilyName("Arial")
+            };
+            //PointF drawPointAddress = new PointF(30.0F, 25.0F);
 
-            Graphics graphics = Graphics.FromImage(bitmapimage);
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            PointF drawPointAddress = new PointF(30.0F, 25.0F);
-            graphics.DrawString(String.Format("{0:N0}", cloudCoin.sn) + " of 16,777,216 on Network: 1", new Font("Arial", 10), Brushes.White, drawPointAddress);
+            canvas.DrawText(String.Format("{0:N0}", cloudCoin.sn) + " of 16,777,216 on Network: 1", 30, 40, textPaint);
+            //graphics.DrawString(String.Format("{0:N0}", cc.sn) + " of 16,777,216 on Network: 1", new Font("Arial", 10), Brushes.White, drawPointAddress);
 
-            ImageConverter converter = new ImageConverter();
-            byte[] snBytes = (byte[])converter.ConvertTo(bitmapimage, typeof(byte[]));
+            //ImageConverter converter = new ImageConverter();
+            //byte[] snBytes = (byte[])converter.ConvertTo(bitmapimage, typeof(byte[]));
+            SKImage image = SKImage.FromBitmap(bitmapimage);
+            SKData data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            byte[] snBytes = data.ToArray();
 
             List<byte> b1 = new List<byte>(snBytes);
             List<byte> b2 = new List<byte>(ccArray);
@@ -383,13 +396,10 @@ namespace CloudCoinClient.CoreClasses
                 tag = rInt.ToString();
             }
 
-            //string fileName = targetPath;
-
-            string fileName = ExportFolder + cloudCoin.FileName + ".jpg";
-            File.WriteAllBytes(OutputFile, b1.ToArray());
-            //Console.Out.WriteLine("Writing to " + fileName);
+            string fileName = ExportFolder + cloudCoin.FileName + tag + ".jpg";
+            File.WriteAllBytes(fileName, b1.ToArray());
+            Console.Out.WriteLine("Writing to " + fileName);
             //CoreLogger.Log("Writing to " + fileName);
-
             return fileSavedSuccessfully;
         }
 
@@ -408,9 +418,7 @@ namespace CloudCoinClient.CoreClasses
                     Margin = margin
                 }
             };
-            Founders.Utils.CloudCoin exportCoin = new Founders.Utils.CloudCoin(cloudCoin);
-            string coinJson = JsonConvert.SerializeObject(exportCoin);
-
+            string coinJson = JsonConvert.SerializeObject(cloudCoin);
             var pixelData = qrCodeWriter.Write(coinJson);
             // creating a bitmap from the raw pixel data; if only black and white colors are used it makes no difference   
             // that the pixel data ist BGRA oriented and the bitmap is initialized with RGB   
@@ -431,30 +439,27 @@ namespace CloudCoinClient.CoreClasses
                 bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                 bitmap.Save(OutputFile);
             }
-            
 
-                return true;
+
+            return true;
         }
 
         public override bool WriteCoinToBARCode(CloudCoin cloudCoin, string OutputFile, string tag)
         {
-            var writer = new BarcodeWriter
-            {
-                Format = BarcodeFormat.PDF_417,
-                Options = new EncodingOptions { Width = 200, Height = 50 } //optional
-            };
-            cloudCoin.pan = null;
-
-            Founders.Utils.CloudCoin exportCoin = new Founders.Utils.CloudCoin(cloudCoin);
-
-            var coinJson = JsonConvert.SerializeObject(exportCoin);
-            var imgBitmap = writer.Write(coinJson);
-            using (var stream = new MemoryStream())
-            {
-                imgBitmap.Save(stream, ImageFormat.Png);
-                stream.ToArray();
-                imgBitmap.Save(OutputFile);
-            }
+            //var writer = new BarcodeWriter
+            //{
+            //    Format = BarcodeFormat.PDF_417,
+            //    Options = new EncodingOptions { Width = 200, Height = 50 } //optional
+            //};
+            //cloudCoin.pan = null;
+            //var coinJson = JsonConvert.SerializeObject(cloudCoin);
+            //var imgBitmap = writer.Write(coinJson);
+            //using (var stream = new MemoryStream())
+            //{
+            //    imgBitmap.Save(stream, ImageFormat.Png);
+            //    stream.ToArray();
+            //    imgBitmap.Save(OutputFile);
+            //}
             return true;
         }
     }

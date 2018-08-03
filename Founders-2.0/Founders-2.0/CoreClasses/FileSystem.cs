@@ -42,9 +42,9 @@ namespace CloudCoinClient.CoreClasses
             RequestsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_REQUESTS + Path.DirectorySeparatorChar;
             DangerousFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_DANGEROUS + Path.DirectorySeparatorChar;
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
-            QRFolder = ImportFolder + Config.TAG_QR;
-            BarCodeFolder = ImportFolder + Config.TAG_BARCODE;
-            CSVFolder = ImportFolder + Config.TAG_CSV;
+            QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
+            BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
+            CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
 
         }
         public override bool CreateFolderStructure()
