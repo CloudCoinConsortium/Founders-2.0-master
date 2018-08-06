@@ -198,7 +198,7 @@ namespace CloudCoinCore
                 {
                     updateLog("Starting Coins detection for Network " + nn);
                     await ProcessNetworkCoins(nn, ChangeANs);
-                    updateLog("Coins detection for Network " + nn + "Finished.");
+                    updateLog("Coins detection for Network " + nn + " Finished.");
                 }
             }
             after = DateTime.Now;

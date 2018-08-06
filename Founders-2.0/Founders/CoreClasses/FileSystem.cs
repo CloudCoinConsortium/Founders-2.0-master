@@ -14,7 +14,7 @@ using ZXing.PDF417;
 using ZXing;
 using ZXing.Common;
 using System.Drawing.Imaging;
-using SkiaSharp;
+
 
 namespace CloudCoinClient.CoreClasses
 {
@@ -343,47 +343,33 @@ namespace CloudCoinClient.CoreClasses
 
             /* READ JPEG TEMPLATE*/
             byte[] jpegBytes = null;
-            switch (cloudCoin.getDenomination())
-            {
-                case 1: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg1.jpg"); break;
-                case 5: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg5.jpg"); break;
-                case 25: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg25.jpg"); break;
-                case 100: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg100.jpg"); break;
-                case 250: jpegBytes = readAllBytes(this.TemplateFolder + "jpeg250.jpg"); break;
-            }// end switch
 
+            //jpegBytes = readAllBytes(filePath);
+            jpegBytes = File.ReadAllBytes(TemplateFile);
 
             /* WRITE THE SERIAL NUMBER ON THE JPEG */
 
             //Bitmap bitmapimage;
-            SKBitmap bitmapimage;
-            //using (var ms = new MemoryStream(jpegBytes))
-            {
+            //jpegBytes = readAllBytes(filePath);
+            jpegBytes = File.ReadAllBytes(TemplateFile);
 
-                //bitmapimage = new Bitmap(ms);
-                bitmapimage = SKBitmap.Decode(jpegBytes);
+            /* WRITE THE SERIAL NUMBER ON THE JPEG */
+
+            Bitmap bitmapimage;
+
+            using (var ms = new MemoryStream(jpegBytes))
+            {
+                bitmapimage = new Bitmap(ms);
             }
-            SKCanvas canvas = new SKCanvas(bitmapimage);
-            //Graphics graphics = Graphics.FromImage(bitmapimage);
-            //graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            //graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            SKPaint textPaint = new SKPaint()
-            {
-                IsAntialias = true,
-                Color = SKColors.White,
-                TextSize = 14,
-                Typeface = SKTypeface.FromFamilyName("Arial")
-            };
-            //PointF drawPointAddress = new PointF(30.0F, 25.0F);
 
-            canvas.DrawText(String.Format("{0:N0}", cloudCoin.sn) + " of 16,777,216 on Network: 1", 30, 40, textPaint);
-            //graphics.DrawString(String.Format("{0:N0}", cc.sn) + " of 16,777,216 on Network: 1", new Font("Arial", 10), Brushes.White, drawPointAddress);
+            Graphics graphics = Graphics.FromImage(bitmapimage);
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            PointF drawPointAddress = new PointF(30.0F, 25.0F);
+            graphics.DrawString(String.Format("{0:N0}", cloudCoin.sn) + " of 16,777,216 on Network: 1", new Font("Arial", 10), Brushes.White, drawPointAddress);
 
-            //ImageConverter converter = new ImageConverter();
-            //byte[] snBytes = (byte[])converter.ConvertTo(bitmapimage, typeof(byte[]));
-            SKImage image = SKImage.FromBitmap(bitmapimage);
-            SKData data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
-            byte[] snBytes = data.ToArray();
+            ImageConverter converter = new ImageConverter();
+            byte[] snBytes = (byte[])converter.ConvertTo(bitmapimage, typeof(byte[]));
 
             List<byte> b1 = new List<byte>(snBytes);
             List<byte> b2 = new List<byte>(ccArray);
@@ -396,10 +382,13 @@ namespace CloudCoinClient.CoreClasses
                 tag = rInt.ToString();
             }
 
-            string fileName = ExportFolder + cloudCoin.FileName + tag + ".jpg";
-            File.WriteAllBytes(fileName, b1.ToArray());
-            Console.Out.WriteLine("Writing to " + fileName);
+            //string fileName = targetPath;
+
+            string fileName = ExportFolder + cloudCoin.FileName + ".jpg";
+            File.WriteAllBytes(OutputFile, b1.ToArray());
+            //Console.Out.WriteLine("Writing to " + fileName);
             //CoreLogger.Log("Writing to " + fileName);
+
             return fileSavedSuccessfully;
         }
 

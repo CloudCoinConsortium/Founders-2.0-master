@@ -642,13 +642,13 @@ namespace Founders
                 {
                     break;
                 }
-                Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
-                Console.Out.WriteLine("----------------------------------");
+                updateLog(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
+                updateLog("----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                Console.Out.WriteLine("Ready Count - " + raida.ReadyCount);
-                Console.Out.WriteLine("Not Ready Count - " + raida.NotReadyCount);
+                updateLog("Ready Count - " + raida.ReadyCount);
+                updateLog("Not Ready Count - " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -891,7 +891,17 @@ namespace Founders
 
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + "." + tag + ".jpg";
+                    if (File.Exists(OutputFile))
+                    {
+                        // tack on a random number if a file already exists with the same tag
+                        Random rnd = new Random();
+                        int tagrand = rnd.Next(999);
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+                    CultureInfo.InvariantCulture);
+                        OutputFile = FS.ExportFolder + coin.FileName + "." + tag + timestamp + ".jpg";
+                    }//end if file exists
+                    OutputFile = OutputFile.Replace("..", ".");
                     bool fileGenerated = FS.WriteCoinToJpeg(coin, FS.GetCoinTemplate(coin), OutputFile, "");
                     if (fileGenerated)
                     {
@@ -928,8 +938,16 @@ namespace Founders
                 {
                     foreach (var coin in exportCoins)
                     {
-                        string OutputFile = FS.ExportFolder + coin.FileName + tag + ".stack";
-                        FS.WriteCoinToFile(coin, OutputFile);
+                        string OutputFile = FS.ExportFolder + coin.FileName + "." + tag + ".stack";
+                        //FS.WriteCoinToFile(coin, OutputFile);
+                        if (File.Exists(OutputFile.Replace("..", ".")))
+                        {
+                            string timestamp = DateTime.UtcNow.ToString("mmssfff",
+    CultureInfo.InvariantCulture);
+                            OutputFile = FS.ExportFolder + coin.FileName + "." + tag + "-t" + timestamp + ".stack";
+                        }
+                        OutputFile = OutputFile.Replace("..", ".");
+                        FS.ExportCoinToFile(coin, OutputFile);
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);
                         FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -945,7 +963,14 @@ namespace Founders
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr." + tag + ".jpg";
+                    if (File.Exists(OutputFile.Replace("..", ".")))
+                    {
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+CultureInfo.InvariantCulture);
+                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
+                    }
+                    OutputFile = OutputFile.Replace("..", ".");
                     bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
@@ -963,7 +988,14 @@ namespace Founders
             {
                 foreach (var coin in exportCoins)
                 {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode" + tag + ".jpg";
+                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + ".jpg";
+                    if (File.Exists(OutputFile.Replace("..", ".")))
+                    {
+                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+CultureInfo.InvariantCulture);
+                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + "-t" + timestamp + ".jpg";
+                    }
+                    OutputFile = OutputFile.Replace("..", ".");
                     bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
                     if (fileGenerated)
                     {
