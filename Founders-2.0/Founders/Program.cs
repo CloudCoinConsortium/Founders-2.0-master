@@ -880,7 +880,7 @@ namespace Founders
             if (file_type == 1)
             {
                 String filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + "");
-                while (File.Exists(filename))
+                while (File.Exists(filename+".jpg"))
                 {
                     // tack on a random number if a file already exists with the same tag
                     //Random rnd = new Random();
@@ -910,7 +910,7 @@ namespace Founders
                 if (stack_type == 1)
                 {
                     String filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "");
-                    while (File.Exists(filename))
+                    while (File.Exists(filename + ".stack"))
                     {
                         // tack on a random number if a file already exists with the same tag
                         //Random rnd = new Random();
@@ -984,7 +984,7 @@ namespace Founders
                     //Random rnd = new Random();
                     //int tagrand = rnd.Next(999);
                     existingFilename++;
-                    filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
+                    filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + ".csv");
 
 
                 }//end if file exists
