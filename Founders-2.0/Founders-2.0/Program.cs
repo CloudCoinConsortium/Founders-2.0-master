@@ -96,7 +96,7 @@ namespace Founders
             }
             else
             {
-                updateLog(RAIDA.networks.Count + " Networks found.");
+                logger.Info(RAIDA.networks.Count + " Networks found.");
                 raida = (from x in RAIDA.networks
                          where x.NetworkNumber == NetworkNumber
                          select x).FirstOrDefault();
@@ -109,7 +109,7 @@ namespace Founders
                 }
                 else
                 {
-                    updateLog("Network Number set to " + NetworkNumber);
+                    logger.Info("Network Number set to " + NetworkNumber);
                 }
             }
             //networks[0]
@@ -226,8 +226,9 @@ namespace Founders
 
             if (args.Length < 1)
             {
-                updateLog("Loading Network Directory");
+                //updateLog("Loading Network Directory");
                 SetupRAIDA();
+                //RAIDA.networks.Add(raida);//add a raida instance to the networks list
                 FS.LoadFileSystem();
 
                 RAIDA.logger = logger;
