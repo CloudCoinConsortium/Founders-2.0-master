@@ -44,7 +44,7 @@ namespace CloudCoinClient.CoreClasses
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
             QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
             BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
-            CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
+            //CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
 
         }
         public override bool CreateFolderStructure()
@@ -94,7 +94,7 @@ namespace CloudCoinClient.CoreClasses
                 Directory.CreateDirectory(LogsFolder);
                 Directory.CreateDirectory(QRFolder);
                 Directory.CreateDirectory(BarCodeFolder);
-                Directory.CreateDirectory(CSVFolder);
+                //Directory.CreateDirectory(CSVFolder);
 
             }
             catch (Exception e)
@@ -112,7 +112,7 @@ namespace CloudCoinClient.CoreClasses
         public override void LoadFileSystem()
         {
             importCoins = LoadFolderCoins(ImportFolder);
-            var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
+            //var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
             var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
             var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
 
@@ -435,20 +435,20 @@ namespace CloudCoinClient.CoreClasses
 
         public override bool WriteCoinToBARCode(CloudCoin cloudCoin, string OutputFile, string tag)
         {
-            //var writer = new BarcodeWriter
-            //{
-            //    Format = BarcodeFormat.PDF_417,
-            //    Options = new EncodingOptions { Width = 200, Height = 50 } //optional
-            //};
-            //cloudCoin.pan = null;
-            //var coinJson = JsonConvert.SerializeObject(cloudCoin);
-            //var imgBitmap = writer.Write(coinJson);
-            //using (var stream = new MemoryStream())
-            //{
-            //    imgBitmap.Save(stream, ImageFormat.Png);
-            //    stream.ToArray();
-            //    imgBitmap.Save(OutputFile);
-            //}
+            var writer = new BarcodeWriter
+            {
+                Format = BarcodeFormat.PDF_417,
+                Options = new EncodingOptions { Width = 200, Height = 50 } //optional
+            };
+            cloudCoin.pan = null;
+            var coinJson = JsonConvert.SerializeObject(cloudCoin);
+            var imgBitmap = writer.Write(coinJson);
+            using (var stream = new MemoryStream())
+            {
+                imgBitmap.Save(stream, ImageFormat.Png);
+                stream.ToArray();
+                imgBitmap.Save(OutputFile);
+            }
             return true;
         }
     }

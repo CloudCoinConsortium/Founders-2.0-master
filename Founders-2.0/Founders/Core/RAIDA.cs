@@ -292,6 +292,7 @@ namespace CloudCoinCore
                 }
                 catch (Exception ex)
                 {
+                    logger.Error(ex.Message);
                     Debug.WriteLine(ex.Message);
                 }
 

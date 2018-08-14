@@ -607,7 +607,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("                      Version: {0}                        ", DateTime.Now.ToString("dd.MMM.yyyy")));
+            updateLog(String.Format("                  Version: 2.0.0.8 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
             updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
             updateLog("      This Software is provided as is with all faults, defects    ");
             updateLog("          and errors, and without warranty of any kind.           ");
@@ -939,18 +939,26 @@ namespace Founders
                     foreach (var coin in exportCoins)
                     {
                         string OutputFile = FS.ExportFolder + coin.FileName + "." + tag + ".stack";
+                        OutputFile = OutputFile.Replace("..", ".");
                         //FS.WriteCoinToFile(coin, OutputFile);
-                        if (File.Exists(OutputFile.Replace("..", ".")))
+                        if (File.Exists(OutputFile))
                         {
                             string timestamp = DateTime.UtcNow.ToString("mmssfff",
     CultureInfo.InvariantCulture);
                             OutputFile = FS.ExportFolder + coin.FileName + "." + tag + "-t" + timestamp + ".stack";
+                            OutputFile = OutputFile.Replace("..", ".");
                         }
-                        OutputFile = OutputFile.Replace("..", ".");
+                        
                         FS.ExportCoinToFile(coin, OutputFile);
-
-                        FS.RemoveCoins(exportCoins, FS.BankFolder);
-                        FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                        try
+                        {
+                            FS.RemoveCoins(exportCoins, FS.BankFolder);
+                            FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                        }catch(IOException e)
+                        {
+                            logger.Error(e.Message);
+                            throw;
+                        }
                         //Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
                     }

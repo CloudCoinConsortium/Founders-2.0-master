@@ -525,12 +525,13 @@ namespace CloudCoinCore
         public abstract void MoveImportedFiles();
         public void RemoveCoins(IEnumerable<CloudCoin> coins, string folder)
         {
+            
+                foreach (var coin in coins)
+                {
+                    File.Delete(folder + (coin.FileName) + ".stack");
 
-            foreach (var coin in coins)
-            {
-                File.Delete(folder + (coin.FileName) + ".stack");
-
-            }
+                }
+            
         }
 
         public void RemoveCoins(IEnumerable<CloudCoin> coins, string folder, string extension)
