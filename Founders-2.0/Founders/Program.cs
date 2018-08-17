@@ -607,7 +607,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("                  Version: 2.0.0.8 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
+            updateLog(String.Format("                  Version: 2.0.0.9 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
             updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
             updateLog("      This Software is provided as is with all faults, defects    ");
             updateLog("          and errors, and without warranty of any kind.           ");
@@ -767,8 +767,9 @@ namespace Founders
         {
             FS.LoadFileSystem();
             CalculateTotals();
-            Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
+            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
             int file_type = reader.readInt(1, 5);
+            logger.Info("User Input : File Type " + file_type);
             int stack_type = 1;
             if (file_type == 2)
             {
@@ -785,46 +786,51 @@ namespace Founders
 
             if (onesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 1s do you want to export?");
+                Console.Out.WriteLine("How many 1s do you want to export? 0-"+onesTotalCount);
                 exp_1 = reader.readInt(0, (onesTotalCount));
-                logger.Info("User Input : 1s To Export" + exp_1);
+                Console.Out.WriteLine("Exporting "+ (exp_1) + " CloudCoins");
+                logger.Info("User Input : 1s To Export " + exp_1);
             }
 
             // if 1s not zero 
             if (fivesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 5s do you want to export?");
+                Console.Out.WriteLine("How many 5s do you want to export? 0-"+fivesTotalCount);
                 exp_5 = reader.readInt(0, (fivesTotalCount));
-                logger.Info("User Input : 5s To Export" + exp_5);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5)) + " CloudCoins");
+                logger.Info("User Input : 5s To Export " + exp_5);
             }
 
             // if 1s not zero 
             if ((qtrTotalCount > 0))
             {
-                Console.Out.WriteLine("  How many 25s do you want to export?");
+                Console.Out.WriteLine("How many 25s do you want to export? 0-"+qtrTotalCount);
                 exp_25 = reader.readInt(0, (qtrTotalCount));
-                logger.Info("User Input : 25s To Export" + exp_25);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25)) + " CloudCoins");
+                logger.Info("User Input : 25s To Export " + exp_25);
             }
 
             // if 1s not zero 
             if (hundredsTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 100s do you want to export?");
+                Console.Out.WriteLine("How many 100s do you want to export? 0-"+hundredsTotalCount);
                 exp_100 = reader.readInt(0, (hundredsTotalCount));
-                logger.Info("User Input : 100s To Export" + exp_100);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100)) + " CloudCoins");
+                logger.Info("User Input : 100s To Export " + exp_100);
             }
 
             // if 1s not zero 
             if (twoFiftiesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 250s do you want to export?");
+                Console.Out.WriteLine("How many 250s do you want to export? 0-"+twoFiftiesTotalCount);
                 exp_250 = reader.readInt(0, (twoFiftiesTotalCount));
-                logger.Info("User Input : 250s To Export" + exp_250);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250)) + " CloudCoins");
+                logger.Info("User Input : 250s To Export " + exp_250);
             }
 
-            Console.Out.WriteLine("  What tag will you add to the file name?");
+            Console.Out.WriteLine("What tag will you add to the file name?");
             String tag = reader.readString();
-            logger.Info("User Input : 1s Tag" + tag);
+            logger.Info("User Input : Tag : " + tag);
 
             int totalSaved = exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250);
             if (totalSaved == 0)

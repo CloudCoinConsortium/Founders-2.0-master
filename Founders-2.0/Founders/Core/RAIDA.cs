@@ -204,8 +204,8 @@ namespace CloudCoinCore
             after = DateTime.Now;
             ts = after.Subtract(before);
 
-            Debug.WriteLine("Detection Completed in : " + ts.TotalMilliseconds / 1000);
-            updateLog("Detection Completed in : " + ts.TotalMilliseconds / 1000);
+            Debug.WriteLine("Detection Completed in:" + ts.TotalMilliseconds / 1000 + " s");
+            updateLog("Detection Completed in:" + ts.TotalMilliseconds / 1000 + " s");
             printStarLine();
         }
 
@@ -347,8 +347,8 @@ namespace CloudCoinCore
 
 
             // Move Coins to their respective folders after sort
-            FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder);
-            FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder);
+            FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder, true);
+            FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder, true);
 
             FS.WriteCoin(failedCoins, FS.CounterfeitFolder, false, true);
             FS.MoveCoins(lostCoins, FS.DetectedFolder, FS.LostFolder);
