@@ -511,16 +511,18 @@ namespace Founders
         {
             Console.Write("Enter Source Location: ");
             string sourceLocation = reader.readString();
+            logger.Info("Source Location: " + sourceLocation);
             if (!Directory.Exists(sourceLocation))
             {
-                Console.WriteLine("Folder does not exist.");
+                updateLog("Folder does not exist.");
                 return;
             }
             Console.Write("Enter Target Folder Location: ");
             string targetLocation = reader.readString();
+            logger.Info("Target Folder Location: " + targetLocation);
             if (!Directory.Exists(targetLocation))
             {
-                Console.WriteLine("Folder does not exist.");
+                updateLog("Folder does not exist.");
                 return;
             }
 
@@ -558,11 +560,13 @@ namespace Founders
             }
             string filename = TargetLocation + Path.DirectorySeparatorChar + "CoinSerials-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower() + ".csv";
             File.WriteAllText(filename, csv.ToString());
+            updateLog("List of Serials saved to: " + filename);
         }
         public static void Backup()
         {
             Console.Write("Enter Backup Location: ");
             string backupLocation = reader.readString();
+            logger.Info("Backing up to: " + backupLocation);
             Backup(backupLocation);
         }
         public static void Backup(string TargetLocation)
@@ -578,11 +582,12 @@ namespace Founders
                 }
                 string FileName = TargetLocation + Path.DirectorySeparatorChar + "CloudCoinsBackup-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower();
                 FS.WriteCoinsToFile(bankCoins, FileName, ".stack");
+                updateLog("CloudCoin Backed up to " + FileName);
                 Console.WriteLine("CloudCoins Backup successful");
             }
             else
             {
-                Console.WriteLine("The target location does not exist.");
+                updateLog("The target location does not exist.");
             }
         }
         private static void ech()
@@ -607,7 +612,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("                  Version: 2.0.0.9 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
+            updateLog(String.Format("                  Version: 2.0.1.0 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
             updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
             updateLog("      This Software is provided as is with all faults, defects    ");
             updateLog("          and errors, and without warranty of any kind.           ");
@@ -954,19 +959,26 @@ namespace Founders
                             OutputFile = FS.ExportFolder + coin.FileName + "." + tag + "-t" + timestamp + ".stack";
                             OutputFile = OutputFile.Replace("..", ".");
                         }
-                        
-                        FS.ExportCoinToFile(coin, OutputFile);
                         try
                         {
-                            FS.RemoveCoins(exportCoins, FS.BankFolder);
-                            FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-                        }catch(IOException e)
+                            FS.WriteCoinToFile(coin, OutputFile);
+                            
+                        }catch(Exception e)
                         {
                             logger.Error(e.Message);
                             throw;
                         }
                         //Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
+                    }
+                    try
+                    {
+                        FS.RemoveCoins(exportCoins, FS.BankFolder);
+                        FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                    }catch(Exception e)
+                    {
+                        logger.Error(e.Message);
+                        throw;
                     }
 
                 }

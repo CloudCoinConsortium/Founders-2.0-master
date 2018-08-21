@@ -254,6 +254,7 @@ namespace CloudCoinCore
                     string requestFileName = Utils.RandomString(16).ToLower() + DateTime.Now.ToString("yyyyMMddHHmmss") + ".stack";
                     // Write Request To file before detect
                     FS.WriteCoinsToFile(coins, FS.RequestsFolder + requestFileName);
+                    logger.Info("Request: " + FS.RequestsFolder + requestFileName);
                     await Task.WhenAll(tasks.AsParallel().Select(async task => await task()));
                     int j = 0;
                     foreach (var coin in coins)
@@ -350,7 +351,7 @@ namespace CloudCoinCore
             FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder, true);
             FS.MoveCoins(frackedCoins, FS.DetectedFolder, FS.FrackedFolder, true);
 
-            FS.WriteCoin(failedCoins, FS.CounterfeitFolder, false, true);
+            FS.MoveCoins(failedCoins, FS.DetectedFolder, FS.CounterfeitFolder);
             FS.MoveCoins(lostCoins, FS.DetectedFolder, FS.LostFolder);
             FS.MoveCoins(suspectCoins, FS.DetectedFolder, FS.SuspectFolder);
 
