@@ -12,6 +12,7 @@ using QRCoder;
 
 using System.Drawing;
 using ZXing;
+using Founders;
 using Founders.Utils;
 
 namespace CloudCoinCore
@@ -69,6 +70,7 @@ namespace CloudCoinCore
         public List<CloudCoin> LoadCoinsByFormat(string folder, Formats format)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
 
             if (format == Formats.BarCode)
             {
@@ -91,7 +93,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -118,7 +120,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -145,7 +147,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -162,7 +164,7 @@ namespace CloudCoinCore
         public List<CloudCoin> LoadFolderCoins(string folder)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
-
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
 
             // Get All the supported CloudCoin Files from the folder
             var files = Directory
@@ -194,7 +196,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
                 if( ext == ".csv")
@@ -220,7 +222,7 @@ namespace CloudCoinCore
         private CloudCoin ReadQRCode(String fileName)//Read a CloudCoin from QR Code 
         {
             CloudCoin coin = new CloudCoin();
-
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
             try
             {
                 Bitmap bitmap = new Bitmap(fileName);
@@ -232,8 +234,9 @@ namespace CloudCoinCore
                 bitmap.Dispose();
                 return cloudCoin;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error(e.Message);
                 return null;
             }
         }
@@ -241,7 +244,7 @@ namespace CloudCoinCore
         private CloudCoin ReadBARCode(String fileName)//Read a CloudCoin from BAR Code . 
         {
             CloudCoin coin = new CloudCoin();
-
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
             try
             {
                 var barcodeReader = new BarcodeReader();
@@ -254,8 +257,9 @@ namespace CloudCoinCore
                 bitmap.Dispose();
                 return cloudCoin;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error(e.Message);
                 return null;
             }
         }
