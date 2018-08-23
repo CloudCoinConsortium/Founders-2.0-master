@@ -346,6 +346,16 @@ namespace CloudCoinCore
             updateLog("  Total Suspect Coins - " + suspectCoins.Count() + "");
             updateLog("  Total Dangerous Coins - " + dangerousCoins.Count() + "");
 
+            //Remove existing duplicate coins in Bank / Fracked
+            var ExistingGoodCoins = FS.LoadFolderCoins(FS.BankFolder);
+            ExistingGoodCoins.Concat(FS.LoadFolderCoins(FS.FrackedFolder));
+            foreach(CloudCoin cc in ExistingGoodCoins)
+            {
+                var duplicateCoin = (from x in detectedCoins where x.sn == cc.sn select x).ToList();
+                FS.RemoveCoins(duplicateCoin, FS.BankFolder);
+                FS.RemoveCoins(duplicateCoin, FS.FrackedFolder);
+            }
+
 
             // Move Coins to their respective folders after sort
             FS.MoveCoins(passedCoins, FS.DetectedFolder, FS.BankFolder, true);

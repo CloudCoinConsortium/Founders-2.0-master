@@ -86,7 +86,7 @@ namespace CloudCoinCore
         }//end ordinal Index of
 
 
-        public static async Task<String> GetHtmlFromURL(String urlAddress)
+        public static async Task<String> GetHtmlFromURL(String urlAddress, int timeout = 0)
         {
             
             string data = "";
@@ -94,6 +94,8 @@ namespace CloudCoinCore
             {
                 using (var cli = new HttpClient())
                 {
+                    if (timeout > 0)
+                        cli.Timeout = TimeSpan.FromMilliseconds(timeout);
                     HttpResponseMessage response = await cli.GetAsync(urlAddress);
                     if (response.IsSuccessStatusCode)
                         data = await response.Content.ReadAsStringAsync();

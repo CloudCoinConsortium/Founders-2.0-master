@@ -128,7 +128,7 @@ namespace CloudCoinCore
             //RAIDA_Status.failsEcho[raidaID] = true;
             try
             {
-                echoResponse.fullResponse = await Utils.GetHtmlFromURL(echoResponse.fullRequest);
+                echoResponse.fullResponse = await Utils.GetHtmlFromURL(echoResponse.fullRequest, 10000);
                 Debug.WriteLine("Echo From Node - " + NodeNumber + ". " + echoResponse.fullResponse);
                 try
                 {
@@ -136,7 +136,7 @@ namespace CloudCoinCore
                 }
                 catch (Exception e)
                 {
-
+                    
                 }
                 //Debug.WriteLine("Echo URL - "+ FullUrl);
                 if (echoResponse.fullResponse.Contains("ready"))
