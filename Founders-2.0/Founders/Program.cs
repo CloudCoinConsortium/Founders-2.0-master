@@ -612,10 +612,10 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("                  Version: 2.0.1.2 {0}                    ", DateTime.Now.ToString("dd.MMM.yyyy")));
-            updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
-            updateLog("      This Software is provided as is with all faults, defects    ");
-            updateLog("          and errors, and without warranty of any kind.           ");
+            updateLog(String.Format("               Version Founders-{0}-2.0.1.2               ", DateTime.Now.ToString("dd-MMM-yyyy")));
+            updateLog("          Used to Authenticate, Store, and Payout CloudCoins      ");
+            updateLog("      This Software is provided as is with all faults, defects,   ");
+            updateLog("              errors, and without warranty of any kind.           ");
             updateLog("                Free from the CloudCoin Consortium.               ");
             //Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
             Console.Out.WriteLine("                                                                  ");
@@ -631,7 +631,8 @@ namespace Founders
             Console.Out.WriteLine("Open 9am to 11pm California Time(PST).");
             //Console.Out.WriteLine("");//Change to 1 (530) 762-1361 when active old number:1 (530) 500 - 2646
             Console.Out.WriteLine("CloudCoinHelp@gmail.com(unsecure)");
-            Console.Out.WriteLine("CloudCoinSupport@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
+            Console.Out.WriteLine("CloudCoinSupport@Protonmail.com");
+            Console.Out.WriteLine("(secure if you get a free encrypted email account at ProtonMail.com)");
 
         }//End Help
 
@@ -712,8 +713,9 @@ namespace Founders
 
         private static void printStarLine()
         {
-            logger.Info("****************************************************************************************************");
-            Console.Out.WriteLine("****************************************************************************************************");
+            
+            logger.Info("********************************************************************************");
+            Console.Out.WriteLine("********************************************************************************");
         }
         public static void updateLog(string logLine)
         {
@@ -772,7 +774,8 @@ namespace Founders
         {
             FS.LoadFileSystem();
             CalculateTotals();
-            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
+            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs, (2) stack (JSON), (3) QR Code,");
+            Console.Out.WriteLine("(4) 2D Bar code, or (5) CSV file?");
             int file_type = reader.readInt(1, 5);
             logger.Info("User Input : File Type " + file_type);
             int stack_type = 1;
@@ -872,8 +875,8 @@ namespace Founders
 
             printStarLine();
             updateLog("Starting CloudCoin Export.");
-            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
-            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            updateLog("Please do not close the CloudCoin Founders program until it is finished.");
+            updateLog("Otherwise it may result in loss of CloudCoins.");
             printStarLine();
             string message = "Exporting "+ totalSaved +" CloudCoins from Bank.";
             updateLog(message);
@@ -1105,12 +1108,14 @@ CultureInfo.InvariantCulture);
             if (((bankTotals[1] + frackedTotals[1]) + (bankTotals[2] + frackedTotals[2]) + (bankTotals[3] + frackedTotals[3]) + (bankTotals[4] + frackedTotals[4]) + (bankTotals[5] + frackedTotals[5])) > 1000)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Out.WriteLine("Warning: You have more than 1000 Notes in your bank. Stack files should not have more than 1000 Notes in them.");
+                Console.Out.WriteLine("Warning: You have more than 1000 Notes in your bank.");
+                Console.Out.WriteLine("Stack files should not have more than 1000 Notes in them.");
                 Console.Out.WriteLine("Do not export stack files with more than 1000 notes. .");
                 Console.ForegroundColor = ConsoleColor.White;
             }//end if they have more than 1000 coins
 
-            Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code file?");
+            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs, (2) stack (JSON),");
+            Console.Out.WriteLine(" (3) QR Code, or (4) 2D Bar code file?");
             int file_type = reader.readInt(1, 4);
             // 1 jpg 2 stack
             if (onesTotalCount > 0)
@@ -1152,9 +1157,9 @@ CultureInfo.InvariantCulture);
             Exporter exporter = new Exporter(FS);
             if (file_type == 1)
             {
-                Console.Out.WriteLine("  Tag your jpegs with 'random' to give them a random number.");
+                Console.Out.WriteLine("Tag your jpegs with 'random' to give them a random number.");
             }
-            Console.Out.WriteLine("  What tag will you add to the file name?");
+            Console.Out.WriteLine("What tag will you add to the file name?");
             String tag = reader.readString();
             //Console.Out.WriteLine(("Exporting to:" + exportFolder));
             if (file_type == 1)

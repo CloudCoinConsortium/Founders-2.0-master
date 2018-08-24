@@ -416,7 +416,8 @@ namespace CloudCoinCore
             {
                 Console.WriteLine("There was an error reading files in your bank.");
                 Console.WriteLine("You may have the aoid memo bug that uses too many double quote marks.");
-                Console.WriteLine("Your bank files are stored using and older version that did not use properly formed JSON.");
+                Console.WriteLine("Your bank files are stored using an older version,");
+                Console.WriteLine("that did not use properly formed JSON.");
                 Console.WriteLine("Would you like to upgrade these files to the newer standard?");
                 Console.WriteLine("Your files will be edited.");
                 Console.WriteLine("1 for yes, 2 for no.");

@@ -328,7 +328,7 @@ namespace CloudCoinCore
                             return cu;
                         }
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(" Using corner " + corner + " Pown is "+ brokeCoin.pown);
+                        Console.WriteLine(" Using corner " + corner + " Pown is "+ brokeCoin.pown);
                         pge.MajorProgressMessage = " Using corner " + corner;
                         raida.OnLogRecieved(pge);
                         //   CoreLogger.Log(" Using corner " + corner);

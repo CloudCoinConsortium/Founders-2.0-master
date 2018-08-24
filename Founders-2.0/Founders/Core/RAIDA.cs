@@ -167,8 +167,8 @@ namespace CloudCoinCore
         }
         private static void printStarLine()
         {
-            logger.Info("****************************************************************************************************");
-            Console.Out.WriteLine("****************************************************************************************************");
+            logger.Info("********************************************************************************");
+            Console.Out.WriteLine("********************************************************************************");
         }
 
         public async static Task ProcessCoins(bool ChangeANs = true)
@@ -177,8 +177,8 @@ namespace CloudCoinCore
                             select x.nn).Distinct().ToList();
             printStarLine();
             updateLog("Starting CloudCoin Import.");
-            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
-            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            updateLog("Please do not close the CloudCoin Founders program until it is finished.");
+            updateLog("Otherwise it may result in loss of CloudCoins.");
             printStarLine();
             updateLog("Starting Detect..");
             printStarLine();
