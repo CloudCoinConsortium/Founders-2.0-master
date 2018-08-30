@@ -612,7 +612,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("               Version Founders-{0}-2.0.0.9               ", DateTime.Now.ToString("dd-MMM-yyyy")));
+            updateLog(String.Format("               Version Founders-{0}-2.0.1.3               ", DateTime.Now.ToString("dd-MMM-yyyy")));
             updateLog("          Used to Authenticate, Store, and Payout CloudCoins      ");
             updateLog("      This Software is provided as is with all faults, defects,   ");
             updateLog("              errors, and without warranty of any kind.           ");
