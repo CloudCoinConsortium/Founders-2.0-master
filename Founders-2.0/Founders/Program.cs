@@ -612,7 +612,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("               Version Founders-{0}-2.0.1.2               ", DateTime.Now.ToString("dd-MMM-yyyy")));
+            updateLog(String.Format("               Version Founders-{0}-2.0.0.9               ", DateTime.Now.ToString("dd-MMM-yyyy")));
             updateLog("          Used to Authenticate, Store, and Payout CloudCoins      ");
             updateLog("      This Software is provided as is with all faults, defects,   ");
             updateLog("              errors, and without warranty of any kind.           ");
@@ -648,13 +648,13 @@ namespace Founders
                 {
                     break;
                 }
-                updateLog(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
+                updateLog(String.Format("Starting Echo to RAIDA "));
                 updateLog("----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                updateLog("Ready Count - " + raida.ReadyCount);
-                updateLog("Not Ready Count - " + raida.NotReadyCount);
+                updateLog("Ready Count " + raida.ReadyCount);
+                updateLog("Not Ready Count " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -691,14 +691,14 @@ namespace Founders
 
         public async static Task EchoRaida()
         {
-            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
+            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA "));
             Console.Out.WriteLine("----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            updateLog("Ready Count - " + raida.ReadyCount);
-            updateLog("Not Ready Count - " + raida.NotReadyCount);
+            updateLog("Ready Count " + raida.ReadyCount);
+            updateLog("Not Ready Count " + raida.NotReadyCount);
             //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
             //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
@@ -943,7 +943,7 @@ namespace Founders
                         filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
                     }//end if file exists
 
-                    FS.WriteCoinsToFile(exportCoins, filename, ".stack");
+                    FS.ExportCoinsToFile(exportCoins, filename, ".stack");
                     updateLog("Coins exported as stack file to " + filename);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -964,7 +964,7 @@ namespace Founders
                         }
                         try
                         {
-                            FS.WriteCoinToFile(coin, OutputFile);
+                            FS.ExportCoinToFile(coin, OutputFile);
                             
                         }catch(Exception e)
                         {

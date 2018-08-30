@@ -947,6 +947,7 @@ namespace Founders
                             OutputFile = FS.ExportFolder + coin.FileName + "." + tag + "-t" + timestamp + ".stack";
                         }
                         OutputFile = OutputFile.Replace("..", ".");
+
                         FS.ExportCoinToFile(coin, OutputFile);
 
                         FS.RemoveCoins(exportCoins, FS.BankFolder);

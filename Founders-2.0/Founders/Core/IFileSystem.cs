@@ -629,10 +629,12 @@ namespace CloudCoinCore
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coins.ToArray());
+
+            ExportStack exportStack = new ExportStack(stack);
             using (StreamWriter sw = new StreamWriter(fileName + extension))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                serializer.Serialize(writer, stack);
+                serializer.Serialize(writer, exportStack);
             }
         }
 

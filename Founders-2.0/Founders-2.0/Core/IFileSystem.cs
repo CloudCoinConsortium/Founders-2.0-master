@@ -638,6 +638,25 @@ namespace CloudCoinCore
             }
         }
 
+        public void ExportCoinToFile(CloudCoin coin, string filename)
+        {
+
+
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            Stack stack = new Stack(coin);
+
+            Founders.Utils.ExportStack exportStack = new Founders.Utils.ExportStack(stack);
+
+            using (StreamWriter sw = new StreamWriter(filename))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, exportStack);
+            }
+        }
+
+
         public void WriteCoin(IEnumerable<CloudCoin> coins, string folder,bool replaceExisting =true, bool writeAll = false)
         {
             if (writeAll)
