@@ -32,7 +32,7 @@ namespace Founders
         public static int NetworkNumber = 1;
         public static SimpleLogger logger = new SimpleLogger(FS.LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
         static TrustedTradeSocket tts;
-
+        static int bankMoney = 0;
         #region Total Variables
         public static int onesCount = 0;
         public static int fivesCount = 0;
@@ -226,6 +226,8 @@ namespace Founders
 
             if (args.Length < 1)
             {
+                printWelcome();
+
                 //updateLog("Loading Network Directory");
                 SetupRAIDA();
                 //RAIDA.networks.Add(raida);//add a raida instance to the networks list
@@ -237,7 +239,6 @@ namespace Founders
                 raida = RAIDA.GetInstance();
                 raida.LoggerHandler += Raida_LoggerHandler;
                 EchoRaida().Wait();
-                printWelcome();
                 while (true)
                 {
                     try
@@ -612,7 +613,7 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("               Version Founders-{0}-2.0.1.3               ", DateTime.Now.ToString("dd-MMM-yyyy")));
+            updateLog(String.Format("               Version Founders-{0}-2.0.1.5               ", DateTime.Now.ToString("dd-MMM-yyyy")));
             updateLog("          Used to Authenticate, Store, and Payout CloudCoins      ");
             updateLog("      This Software is provided as is with all faults, defects,   ");
             updateLog("              errors, and without warranty of any kind.           ");
@@ -629,11 +630,9 @@ namespace Founders
             Console.Out.WriteLine("");
             Console.Out.WriteLine("Customer Service:");
             Console.Out.WriteLine("Open 9am to 11pm California Time(PST).");
-            //Console.Out.WriteLine("");//Change to 1 (530) 762-1361 when active old number:1 (530) 500 - 2646
-            Console.Out.WriteLine("CloudCoinHelp@gmail.com(unsecure)");
             Console.Out.WriteLine("CloudCoinSupport@Protonmail.com");
             Console.Out.WriteLine("(secure if you get a free encrypted email account at ProtonMail.com)");
-
+            //Console.Out.WriteLine();
         }//End Help
 
         // Echoes All the RAIDA networks and present the detailed response in a tabular format
@@ -649,12 +648,12 @@ namespace Founders
                     break;
                 }
                 updateLog(String.Format("Starting Echo to RAIDA "));
-                updateLog("----------------------------------");
+                updateLog("-----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                updateLog("Ready Count " + raida.ReadyCount);
-                updateLog("Not Ready Count " + raida.NotReadyCount);
+                updateLog("Ready Count: " + raida.ReadyCount);
+                updateLog("Not Ready Count: " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -692,13 +691,13 @@ namespace Founders
         public async static Task EchoRaida()
         {
             Console.Out.WriteLine(String.Format("Starting Echo to RAIDA "));
-            Console.Out.WriteLine("----------------------------------");
+            Console.Out.WriteLine("-----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            updateLog("Ready Count " + raida.ReadyCount);
-            updateLog("Not Ready Count " + raida.NotReadyCount);
+            updateLog("Ready Count: " + raida.ReadyCount);
+            updateLog("Not Ready Count: " + raida.NotReadyCount);
             //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
             //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
@@ -769,11 +768,21 @@ namespace Founders
             hundredsTotalCount = hundredsCount + hundredsFrackedCount;
             twoFiftiesTotalCount = twoFiftiesCount + twoFrackedFiftiesCount;
 
+            bankMoney = onesTotalCount + fivesTotalCount + qtrTotalCount + hundredsTotalCount + twoFiftiesTotalCount;
+
+
         }
         public static void ExportCoins()
         {
             FS.LoadFileSystem();
             CalculateTotals();
+            if(bankMoney ==0)
+            {
+                printStarLine();
+                updateLog("You have 0 coins in Bank.");
+                printStarLine();
+                return;
+            }
             Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs, (2) stack (JSON), (3) QR Code,");
             Console.Out.WriteLine("(4) 2D Bar code, or (5) CSV file?");
             int file_type = reader.readInt(1, 5);

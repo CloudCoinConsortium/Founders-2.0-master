@@ -205,6 +205,10 @@ namespace CloudCoinCore
             ts = after.Subtract(before);
 
             Debug.WriteLine("Detection Completed in:" + ts.TotalMilliseconds / 1000 + " s");
+            if(ts.Milliseconds ==0)
+            {
+                updateLog("No coins detected in Import folder.");
+            }
             updateLog("Detection Completed in:" + ts.TotalMilliseconds / 1000 + " s");
             printStarLine();
         }
@@ -224,6 +228,33 @@ namespace CloudCoinCore
 
             IFileSystem.predetectCoins = predetectCoins;
 
+            #region Check Existing coins and skip them
+
+            IEnumerable<CloudCoin> bankCoins = IFileSystem.bankCoins;
+            IEnumerable<CloudCoin> frackedCoins1 = IFileSystem.frackedCoins;
+
+            var bCoins = bankCoins.ToList();
+            bCoins.AddRange(frackedCoins1);
+            //bankCoins.ToList().AddRange(frackedCoins1);
+
+            var totalBankCoins = bCoins;
+
+            var snList = (from x in totalBankCoins
+                          where x.nn== NetworkNumber
+                          select x.sn).ToList();
+
+            var newCoins = from x in predetectCoins where !snList.Contains(x.sn) select x;
+            var existingCoins = from x in predetectCoins where snList.Contains(x.sn) select x;
+
+            foreach (var coin in existingCoins)
+            {
+                updateLog("Found coin SN:" + coin.sn + " in folders. Skipping detection of the coin SN:" + coin.sn);
+                FS.MoveFile(FS.PreDetectFolder + coin.FileName + ".stack", FS.TrashFolder + coin.FileName + ".stack", IFileSystem.FileMoveOptions.Replace);
+            }
+
+            predetectCoins = newCoins.ToList() ;
+
+            #endregion
             RAIDA raida = (from x in networks
                            where x.NetworkNumber == NetworkNumber
                            select x).FirstOrDefault();
