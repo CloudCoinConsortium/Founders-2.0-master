@@ -202,7 +202,8 @@ namespace CloudCoinCore
         {
             //The coin is considered fracked if it has any fails
             bool returnTruth = false;
-            if (charCount(pown, 'f') > 0 || charCount(pown, 'n') > 0)
+            //if (charCount(pown, 'f') > 0 || charCount(pown, 'n') > 0)
+            if (charCount(pown, 'f') > 0)
             {
                 returnTruth = true;
             }
@@ -597,7 +598,8 @@ namespace CloudCoinCore
         {
             //The coin is considered ungradable if it does not get more than 19 RAIDA available
             bool returnTruth = false;
-            if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
+            //if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
+            if (charCount(pown, 'f') + charCount(pown, 'p') > 19 && isFixable())
             {
                 returnTruth = true;
                 //Console.Out.WriteLine("isGradable");

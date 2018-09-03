@@ -293,7 +293,7 @@ namespace Founders
                     }
                     if (stats.HasValue())
                     {
-                        await EchoRaidas(true);
+                        await EchoRaidas(true,true);
                     }
                     if (total.HasValue())
                     {
@@ -637,7 +637,7 @@ namespace Founders
 
         // Echoes All the RAIDA networks and present the detailed response in a tabular format
 
-        public async static Task EchoRaidas(bool scanAll = false)
+        public async static Task EchoRaidas(bool scanAll = false,bool showDetail= false)
         {
             var networks = (from x in RAIDA.networks
                             select x).Distinct().ToList();
@@ -666,7 +666,8 @@ namespace Founders
                             table.AddRow("RAIDA " + i, network.nodes[i].RAIDANodeStatus == NodeStatus.Ready ? "Ready" : "Not Ready", "", "", "");
                     }
 
-                    //table.Write();
+                    if(showDetail)
+                        table.Write();
                     logger.Info(table.ToString());
                 }
                 catch (Exception e)

@@ -196,7 +196,9 @@ namespace CloudCoinCore
                                      select x).Count();
                 if (NetworkExists > 0)
                 {
-                    updateLog("Starting Coins detection for Network " + nn);
+                    //updateLog("Starting Coins detection for Network " + nn);
+                    updateLog("Depositing: Checking all authenticity numbers and changing them on the RAIDA.");
+
                     await ProcessNetworkCoins(nn, ChangeANs);
                     updateLog("Coins detection for Network " + nn + " Finished.");
                 }
