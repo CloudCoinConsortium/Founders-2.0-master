@@ -42,8 +42,8 @@ namespace CloudCoinClient.CoreClasses
             RequestsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_REQUESTS + Path.DirectorySeparatorChar;
             DangerousFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_DANGEROUS + Path.DirectorySeparatorChar;
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
-            QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
-            BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
+            //QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
+            //BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
             CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
 
         }
@@ -92,9 +92,9 @@ namespace CloudCoinClient.CoreClasses
                 Directory.CreateDirectory(RequestsFolder);
                 Directory.CreateDirectory(DangerousFolder);
                 Directory.CreateDirectory(LogsFolder);
-                Directory.CreateDirectory(QRFolder);
-                Directory.CreateDirectory(BarCodeFolder);
-                Directory.CreateDirectory(CSVFolder);
+                //Directory.CreateDirectory(QRFolder);
+                //Directory.CreateDirectory(BarCodeFolder);
+                //Directory.CreateDirectory(CSVFolder);
 
             }
             catch (Exception e)
@@ -113,13 +113,13 @@ namespace CloudCoinClient.CoreClasses
         {
             importCoins = LoadFolderCoins(ImportFolder);
             var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
-            var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
-            var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
+            //var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
+            //var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
 
             // Add Additional File formats if present
             //importCoins = importCoins.Concat(csvCoins);
-            importCoins = importCoins.Concat(BarCodeCoins);
-            importCoins = importCoins.Concat(qrCoins);
+            //importCoins = importCoins.Concat(BarCodeCoins);
+            //importCoins = importCoins.Concat(qrCoins);
 
             Debug.WriteLine("Count -" + importCoins.Count());
 

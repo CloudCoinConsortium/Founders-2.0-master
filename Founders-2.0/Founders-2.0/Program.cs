@@ -32,7 +32,7 @@ namespace Founders
         public static int NetworkNumber = 1;
         public static SimpleLogger logger = new SimpleLogger(FS.LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
         static TrustedTradeSocket tts;
-
+        static int bankMoney = 0;
         #region Total Variables
         public static int onesCount = 0;
         public static int fivesCount = 0;
@@ -59,15 +59,15 @@ namespace Founders
             //Console.WriteLine("Your TA (Temporary Address): " + tts.secretWord);
             //Console.WriteLine("Give your TA to people who want to send you CloudCoins via Trusted Transfer");
             //Console.WriteLine();
-            Console.WriteLine("1. Echo RAIDA (Check your connection to the Counterfeit Detection System)");
-            Console.WriteLine("2. Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
-            Console.WriteLine("3. Deposit (Authenticate, Pown (Password own) and Import Coins Into Your Bank Folder)");
-            Console.WriteLine("4. Withdraw (Export Coins From Your Bank Folder)");
-            Console.WriteLine("5. Fix Fracked (Heal Coins That Some RAIDA think are Fake)");
-            Console.WriteLine("6. Show Folders (Show the location of your Bank Folder)");
-            Console.WriteLine("7. Backup (Backup all coins stored in Bank and Fracked folder into *.stack file)");
-            Console.WriteLine("8. List Serials (Create CSV file with serial numbers of all coins stored in selected folder)");
-            Console.WriteLine("9. Help ( CloudCoinSupport@Protonmail.com )");
+            Console.WriteLine("1.Echo RAIDA (Check your connection to the Counterfeit Detection System)");
+            Console.WriteLine("2.Show Balance (See the amount of Coins in the Bank and Fracked Folders)");
+            Console.WriteLine("3.Deposit (Authenticate, Pown (Password own) and Import Coins Into Bank Folder)");
+            Console.WriteLine("4.Withdraw (Export Coins From Your Bank Folder)");
+            Console.WriteLine("5.Fix Fracked (Heal Coins That Some RAIDA think are Fake)");
+            Console.WriteLine("6.Show Folders (Show the location of your Bank Folder)");
+            Console.WriteLine("7.Backup (Backup all coins stored in Bank and Fracked folder into *.stack file)");
+            Console.WriteLine("8.List Serials (Create CSV file with serial numbers of all coins stored)");
+            Console.WriteLine("9.Help ( CloudCoinSupport@Protonmail.com )");
             //            Console.WriteLine("8. Switch Network");
             //      Console.WriteLine("10. Send Coins Using Trusted Third Party");
             Console.WriteLine("10. Exit");
@@ -226,6 +226,8 @@ namespace Founders
 
             if (args.Length < 1)
             {
+                printWelcome();
+
                 //updateLog("Loading Network Directory");
                 SetupRAIDA();
                 //RAIDA.networks.Add(raida);//add a raida instance to the networks list
@@ -237,7 +239,6 @@ namespace Founders
                 raida = RAIDA.GetInstance();
                 raida.LoggerHandler += Raida_LoggerHandler;
                 EchoRaida().Wait();
-                printWelcome();
                 while (true)
                 {
                     try
@@ -292,7 +293,7 @@ namespace Founders
                     }
                     if (stats.HasValue())
                     {
-                        await EchoRaidas(true);
+                        await EchoRaidas(true, true);
                     }
                     if (total.HasValue())
                     {
@@ -511,16 +512,18 @@ namespace Founders
         {
             Console.Write("Enter Source Location: ");
             string sourceLocation = reader.readString();
+            logger.Info("Source Location: " + sourceLocation);
             if (!Directory.Exists(sourceLocation))
             {
-                Console.WriteLine("Folder does not exist.");
+                updateLog("Folder does not exist.");
                 return;
             }
             Console.Write("Enter Target Folder Location: ");
             string targetLocation = reader.readString();
+            logger.Info("Target Folder Location: " + targetLocation);
             if (!Directory.Exists(targetLocation))
             {
-                Console.WriteLine("Folder does not exist.");
+                updateLog("Folder does not exist.");
                 return;
             }
 
@@ -558,11 +561,13 @@ namespace Founders
             }
             string filename = TargetLocation + Path.DirectorySeparatorChar + "CoinSerials-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower() + ".csv";
             File.WriteAllText(filename, csv.ToString());
+            updateLog("List of Serials saved to: " + filename);
         }
         public static void Backup()
         {
             Console.Write("Enter Backup Location: ");
             string backupLocation = reader.readString();
+            logger.Info("Backing up to: " + backupLocation);
             Backup(backupLocation);
         }
         public static void Backup(string TargetLocation)
@@ -578,11 +583,12 @@ namespace Founders
                 }
                 string FileName = TargetLocation + Path.DirectorySeparatorChar + "CloudCoinsBackup-t" + DateTime.Now.ToString("yyyyMMddhhmmss").ToLower();
                 FS.WriteCoinsToFile(bankCoins, FileName, ".stack");
+                updateLog("CloudCoin Backed up to " + FileName);
                 Console.WriteLine("CloudCoins Backup successful");
             }
             else
             {
-                Console.WriteLine("The target location does not exist.");
+                updateLog("The target location does not exist.");
             }
         }
         private static void ech()
@@ -607,10 +613,10 @@ namespace Founders
             Console.ForegroundColor = ConsoleColor.White;
             updateLog("                                                                  ");
             updateLog("                   CloudCoin Founders Edition                     ");
-            updateLog(String.Format("                      Version: {0}                        ", DateTime.Now.ToString("dd.MMM.yyyy")));
-            updateLog("          Used to Authenticate, Store and Payout CloudCoins       ");
-            updateLog("      This Software is provided as is with all faults, defects    ");
-            updateLog("          and errors, and without warranty of any kind.           ");
+            updateLog(String.Format("               Version Founders-{0}-2.0.1.6               ", DateTime.Now.ToString("dd-MMM-yyyy")));
+            updateLog("          Used to Authenticate, Store, and Payout CloudCoins      ");
+            updateLog("      This Software is provided as is with all faults, defects,   ");
+            updateLog("              errors, and without warranty of any kind.           ");
             updateLog("                Free from the CloudCoin Consortium.               ");
             //Console.Out.WriteLine("                            Network Number " + NetworkNumber + "                      ");
             Console.Out.WriteLine("                                                                  ");
@@ -624,15 +630,14 @@ namespace Founders
             Console.Out.WriteLine("");
             Console.Out.WriteLine("Customer Service:");
             Console.Out.WriteLine("Open 9am to 11pm California Time(PST).");
-            //Console.Out.WriteLine("");//Change to 1 (530) 762-1361 when active old number:1 (530) 500 - 2646
-            Console.Out.WriteLine("CloudCoinHelp@gmail.com(unsecure)");
-            Console.Out.WriteLine("CloudCoinSupport@Protonmail.com(secure if you get a free encrypted email account at ProtonMail.com)");
-
+            Console.Out.WriteLine("CloudCoinSupport@Protonmail.com");
+            Console.Out.WriteLine("(secure if you get a free encrypted email account at ProtonMail.com)");
+            //Console.Out.WriteLine();
         }//End Help
 
         // Echoes All the RAIDA networks and present the detailed response in a tabular format
 
-        public async static Task EchoRaidas(bool scanAll = false)
+        public async static Task EchoRaidas(bool scanAll = false, bool showDetail = false)
         {
             var networks = (from x in RAIDA.networks
                             select x).Distinct().ToList();
@@ -642,13 +647,13 @@ namespace Founders
                 {
                     break;
                 }
-                updateLog(String.Format("Starting Echo to RAIDA Network {0}", network.NetworkNumber));
-                updateLog("----------------------------------");
+                updateLog(String.Format("Starting Echo to RAIDA "));
+                updateLog("-----------------------------------");
                 var echos = network.GetEchoTasks();
 
                 await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-                updateLog("Ready Count - " + raida.ReadyCount);
-                updateLog("Not Ready Count - " + raida.NotReadyCount);
+                updateLog("Ready Count: " + raida.ReadyCount);
+                updateLog("Not Ready Count: " + raida.NotReadyCount);
                 try
                 {
                     var table = new ConsoleTable("Server", "Status", "Message", "Version", "Time");
@@ -661,7 +666,8 @@ namespace Founders
                             table.AddRow("RAIDA " + i, network.nodes[i].RAIDANodeStatus == NodeStatus.Ready ? "Ready" : "Not Ready", "", "", "");
                     }
 
-                    //table.Write();
+                    if (showDetail)
+                        table.Write();
                     logger.Info(table.ToString());
                 }
                 catch (Exception e)
@@ -685,14 +691,14 @@ namespace Founders
 
         public async static Task EchoRaida()
         {
-            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA Network {0}", NetworkNumber));
-            Console.Out.WriteLine("----------------------------------");
+            Console.Out.WriteLine(String.Format("Starting Echo to RAIDA "));
+            Console.Out.WriteLine("-----------------------------------");
             var echos = raida.GetEchoTasks();
 
 
             await Task.WhenAll(echos.AsParallel().Select(async task => await task()));
-            updateLog("Ready Count - " + raida.ReadyCount);
-            updateLog("Not Ready Count - " + raida.NotReadyCount);
+            updateLog("Ready Count: " + raida.ReadyCount);
+            updateLog("Not Ready Count: " + raida.NotReadyCount);
             //Console.Out.WriteLine("Ready Count -" + raida.ReadyCount);
             //Console.Out.WriteLine("Not Ready Count -" + raida.NotReadyCount);
 
@@ -707,8 +713,9 @@ namespace Founders
 
         private static void printStarLine()
         {
-            logger.Info("****************************************************************************************************");
-            Console.Out.WriteLine("****************************************************************************************************");
+
+            logger.Info("********************************************************************************");
+            Console.Out.WriteLine("********************************************************************************");
         }
         public static void updateLog(string logLine)
         {
@@ -762,13 +769,25 @@ namespace Founders
             hundredsTotalCount = hundredsCount + hundredsFrackedCount;
             twoFiftiesTotalCount = twoFiftiesCount + twoFrackedFiftiesCount;
 
+            bankMoney = onesTotalCount + fivesTotalCount + qtrTotalCount + hundredsTotalCount + twoFiftiesTotalCount;
+
+
         }
         public static void ExportCoins()
         {
             FS.LoadFileSystem();
             CalculateTotals();
-            Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code (5) CSV file?");
+            if (bankMoney == 0)
+            {
+                printStarLine();
+                updateLog("You have 0 coins in Bank.");
+                printStarLine();
+                return;
+            }
+            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs, (2) stack (JSON) or (3) CSV file?");
+           // Console.Out.WriteLine("(4) 2D Bar code, or (5) CSV file?");
             int file_type = reader.readInt(1, 5);
+            logger.Info("User Input : File Type " + file_type);
             int stack_type = 1;
             if (file_type == 2)
             {
@@ -785,46 +804,51 @@ namespace Founders
 
             if (onesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 1s do you want to export?");
+                Console.Out.WriteLine("How many 1s do you want to export? 0-" + onesTotalCount);
                 exp_1 = reader.readInt(0, (onesTotalCount));
-                logger.Info("User Input : 1s To Export" + exp_1);
+                Console.Out.WriteLine("Exporting " + (exp_1) + " CloudCoins");
+                logger.Info("User Input : 1s To Export " + exp_1);
             }
 
             // if 1s not zero 
             if (fivesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 5s do you want to export?");
+                Console.Out.WriteLine("How many 5s do you want to export? 0-" + fivesTotalCount);
                 exp_5 = reader.readInt(0, (fivesTotalCount));
-                logger.Info("User Input : 5s To Export" + exp_5);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5)) + " CloudCoins");
+                logger.Info("User Input : 5s To Export " + exp_5);
             }
 
             // if 1s not zero 
             if ((qtrTotalCount > 0))
             {
-                Console.Out.WriteLine("  How many 25s do you want to export?");
+                Console.Out.WriteLine("How many 25s do you want to export? 0-" + qtrTotalCount);
                 exp_25 = reader.readInt(0, (qtrTotalCount));
-                logger.Info("User Input : 25s To Export" + exp_25);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25)) + " CloudCoins");
+                logger.Info("User Input : 25s To Export " + exp_25);
             }
 
             // if 1s not zero 
             if (hundredsTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 100s do you want to export?");
+                Console.Out.WriteLine("How many 100s do you want to export? 0-" + hundredsTotalCount);
                 exp_100 = reader.readInt(0, (hundredsTotalCount));
-                logger.Info("User Input : 100s To Export" + exp_100);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100)) + " CloudCoins");
+                logger.Info("User Input : 100s To Export " + exp_100);
             }
 
             // if 1s not zero 
             if (twoFiftiesTotalCount > 0)
             {
-                Console.Out.WriteLine("  How many 250s do you want to export?");
+                Console.Out.WriteLine("How many 250s do you want to export? 0-" + twoFiftiesTotalCount);
                 exp_250 = reader.readInt(0, (twoFiftiesTotalCount));
-                logger.Info("User Input : 250s To Export" + exp_250);
+                Console.Out.WriteLine("Exporting " + (exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250)) + " CloudCoins");
+                logger.Info("User Input : 250s To Export " + exp_250);
             }
 
-            Console.Out.WriteLine("  What tag will you add to the file name?");
+            Console.Out.WriteLine("What tag will you add to the file name?");
             String tag = reader.readString();
-            logger.Info("User Input : 1s Tag" + tag);
+            logger.Info("User Input : Tag : " + tag);
 
             int totalSaved = exp_1 + (exp_5 * 5) + (exp_25 * 25) + (exp_100 * 100) + (exp_250 * 250);
             if (totalSaved == 0)
@@ -861,13 +885,13 @@ namespace Founders
 
             printStarLine();
             updateLog("Starting CloudCoin Export.");
-            updateLog("  Please do not close the CloudCoin CE program until it is finished.");
-            updateLog("  Otherwise it may result in loss of CloudCoins.");
+            updateLog("Please do not close the CloudCoin Founders program until it is finished.");
+            updateLog("Otherwise it may result in loss of CloudCoins.");
             printStarLine();
-            string message = "Exporting "+ totalSaved +" CloudCoins from Bank.";
+            string message = "Exporting " + totalSaved + " CloudCoins from Bank.";
             updateLog(message);
             printStarLine();
-            if(totalCoins.Count() >1000)
+            if (totalCoins.Count() > 1000)
             {
                 printStarLine();
                 updateLog("Warning!: You have more than 1000 Notes in your bank.");
@@ -879,14 +903,14 @@ namespace Founders
             int existingFilename = 0;
             if (file_type == 1)
             {
-                String filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + "");
-                while (File.Exists(filename+".jpg"))
+                String filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "");
+                while (File.Exists(filename + ".jpg"))
                 {
                     // tack on a random number if a file already exists with the same tag
                     //Random rnd = new Random();
                     //int tagrand = rnd.Next(999);
                     existingFilename++;
-                    filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + "."+ existingFilename + "");
+                    filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
                 }//end if file exists
 
                 foreach (var coin in exportCoins)
@@ -929,7 +953,7 @@ namespace Founders
                         filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + "." + existingFilename + "");
                     }//end if file exists
 
-                    FS.WriteCoinsToFile(exportCoins, filename, ".stack");
+                    FS.ExportCoinsToFile(exportCoins, filename, ".stack");
                     updateLog("Coins exported as stack file to " + filename);
                     FS.RemoveCoins(exportCoins, FS.BankFolder);
                     FS.RemoveCoins(exportCoins, FS.FrackedFolder);
@@ -939,78 +963,94 @@ namespace Founders
                     foreach (var coin in exportCoins)
                     {
                         string OutputFile = FS.ExportFolder + coin.FileName + "." + tag + ".stack";
+                        OutputFile = OutputFile.Replace("..", ".");
                         //FS.WriteCoinToFile(coin, OutputFile);
-                        if (File.Exists(OutputFile.Replace("..", ".")))
+                        if (File.Exists(OutputFile))
                         {
                             string timestamp = DateTime.UtcNow.ToString("mmssfff",
     CultureInfo.InvariantCulture);
                             OutputFile = FS.ExportFolder + coin.FileName + "." + tag + "-t" + timestamp + ".stack";
+                            OutputFile = OutputFile.Replace("..", ".");
                         }
-                        OutputFile = OutputFile.Replace("..", ".");
+                        try
+                        {
+                            FS.ExportCoinToFile(coin, OutputFile);
 
-                        FS.ExportCoinToFile(coin, OutputFile);
-
-                        FS.RemoveCoins(exportCoins, FS.BankFolder);
-                        FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error(e.Message);
+                            throw;
+                        }
                         //Console.WriteLine("CloudCoin exported as Stack to " + OutputFile);
                         updateLog("CloudCoin exported as Stack to " + OutputFile);
+                    }
+                    try
+                    {
+                        FS.RemoveCoins(exportCoins, FS.BankFolder);
+                        FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.Message);
+                        throw;
                     }
 
                 }
             }
 
             // Export Coins as QR Code
+//            if (file_type == 3)
+//            {
+//                foreach (var coin in exportCoins)
+//                {
+//                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr." + tag + ".jpg";
+//                    if (File.Exists(OutputFile.Replace("..", ".")))
+//                    {
+//                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+//CultureInfo.InvariantCulture);
+//                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
+//                    }
+//                    OutputFile = OutputFile.Replace("..", ".");
+//                    bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
+//                    if (fileGenerated)
+//                    {
+//                        updateLog("CloudCoin Exported as QR code to " + OutputFile);
+//                        //Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
+//                    }
+//                }
+
+//                FS.RemoveCoins(exportCoins, FS.BankFolder);
+//                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+//            }
+
+//            // Export Coins as 2D Bar code - PDF417
+//            if (file_type == 4)
+//            {
+//                foreach (var coin in exportCoins)
+//                {
+//                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + ".jpg";
+//                    if (File.Exists(OutputFile.Replace("..", ".")))
+//                    {
+//                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
+//CultureInfo.InvariantCulture);
+//                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + "-t" + timestamp + ".jpg";
+//                    }
+//                    OutputFile = OutputFile.Replace("..", ".");
+//                    bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
+//                    if (fileGenerated)
+//                    {
+//                        updateLog("CloudCoin Exported as Bar code to " + OutputFile);
+//                        //Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
+//                    }
+//                }
+
+//                FS.RemoveCoins(exportCoins, FS.BankFolder);
+//                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
+//            }
             if (file_type == 3)
             {
-                foreach (var coin in exportCoins)
-                {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".qr." + tag + ".jpg";
-                    if (File.Exists(OutputFile.Replace("..", ".")))
-                    {
-                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
-CultureInfo.InvariantCulture);
-                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + timestamp + ".jpg";
-                    }
-                    OutputFile = OutputFile.Replace("..", ".");
-                    bool fileGenerated = FS.WriteCoinToQRCode(coin, OutputFile, tag);
-                    if (fileGenerated)
-                    {
-                        updateLog("CloudCoin Exported as QR code to " + OutputFile);
-                        //Console.WriteLine("CloudCoin Exported as QR code to " + OutputFile);
-                    }
-                }
-
-                FS.RemoveCoins(exportCoins, FS.BankFolder);
-                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-            }
-
-            // Export Coins as 2D Bar code - PDF417
-            if (file_type == 4)
-            {
-                foreach (var coin in exportCoins)
-                {
-                    string OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + ".jpg";
-                    if (File.Exists(OutputFile.Replace("..", ".")))
-                    {
-                        string timestamp = DateTime.UtcNow.ToString("mmssfff",
-CultureInfo.InvariantCulture);
-                        OutputFile = FS.ExportFolder + coin.FileName + ".barcode." + tag + "-t" + timestamp + ".jpg";
-                    }
-                    OutputFile = OutputFile.Replace("..", ".");
-                    bool fileGenerated = FS.WriteCoinToBARCode(coin, OutputFile, tag);
-                    if (fileGenerated)
-                    {
-                        updateLog("CloudCoin Exported as Bar code to " + OutputFile);
-                        //Console.WriteLine("CloudCoin Exported as Bar code to " + OutputFile);
-                    }
-                }
-
-                FS.RemoveCoins(exportCoins, FS.BankFolder);
-                FS.RemoveCoins(exportCoins, FS.FrackedFolder);
-            }
-            if (file_type == 5)
-            {
-                String filename = (FS.ExportFolder  + totalSaved + ".CloudCoins." + tag + ".csv");
+                String filename = (FS.ExportFolder + totalSaved + ".CloudCoins." + tag + ".csv");
                 while (File.Exists(filename))
                 {
                     // tack on a random number if a file already exists with the same tag
@@ -1056,7 +1096,7 @@ CultureInfo.InvariantCulture);
             }
             printStarLine();
             updateLog("Export of the CloudCoins Completed.");
-            updateLog("  Exported "+ exportCoins.Count() +" coins in Total of "+ totalSaved +" CC into " + FS.ExportFolder);
+            updateLog("  Exported " + exportCoins.Count() + " coins in Total of " + totalSaved + " CC into " + FS.ExportFolder);
             printStarLine();
         }
 
@@ -1080,12 +1120,14 @@ CultureInfo.InvariantCulture);
             if (((bankTotals[1] + frackedTotals[1]) + (bankTotals[2] + frackedTotals[2]) + (bankTotals[3] + frackedTotals[3]) + (bankTotals[4] + frackedTotals[4]) + (bankTotals[5] + frackedTotals[5])) > 1000)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Out.WriteLine("Warning: You have more than 1000 Notes in your bank. Stack files should not have more than 1000 Notes in them.");
+                Console.Out.WriteLine("Warning: You have more than 1000 Notes in your bank.");
+                Console.Out.WriteLine("Stack files should not have more than 1000 Notes in them.");
                 Console.Out.WriteLine("Do not export stack files with more than 1000 notes. .");
                 Console.ForegroundColor = ConsoleColor.White;
             }//end if they have more than 1000 coins
 
-            Console.Out.WriteLine("  Do you want to export your CloudCoin to (1)jpgs , (2) stack (JSON) , (3) QR Code (4) 2D Bar code file?");
+            Console.Out.WriteLine("Do you want to export your CloudCoin to (1)jpgs, (2) stack (JSON),");
+            Console.Out.WriteLine(" (3) QR Code, or (4) 2D Bar code file?");
             int file_type = reader.readInt(1, 4);
             // 1 jpg 2 stack
             if (onesTotalCount > 0)
@@ -1127,9 +1169,9 @@ CultureInfo.InvariantCulture);
             Exporter exporter = new Exporter(FS);
             if (file_type == 1)
             {
-                Console.Out.WriteLine("  Tag your jpegs with 'random' to give them a random number.");
+                Console.Out.WriteLine("Tag your jpegs with 'random' to give them a random number.");
             }
-            Console.Out.WriteLine("  What tag will you add to the file name?");
+            Console.Out.WriteLine("What tag will you add to the file name?");
             String tag = reader.readString();
             //Console.Out.WriteLine(("Exporting to:" + exportFolder));
             if (file_type == 1)
@@ -1257,7 +1299,7 @@ CultureInfo.InvariantCulture);
             }
             Exporter exporter = new Exporter(FS);
             exporter.writeJSONFile(exp_1, exp_5, exp_25, exp_100, exp_250, "TrustedTrade");
-            string path = FS.ExportFolder  + total + ".CloudCoins.TrustedTrade.stack";
+            string path = FS.ExportFolder + total + ".CloudCoins.TrustedTrade.stack";
             Console.Out.WriteLine("Sending " + path);
             string stack = File.ReadAllText(path);
             await tts.SendCoins(word, stack);

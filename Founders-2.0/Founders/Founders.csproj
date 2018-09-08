@@ -41,7 +41,7 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>clcert.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>cert.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="McMaster.Extensions.CommandLineUtils, Version=2.2.4.0, Culture=neutral, PublicKeyToken=6f71cb76b82f055d, processorArchitecture=MSIL">
@@ -179,6 +179,7 @@
     <EmbeddedResource Include="directory.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Include="cert.pfx" />
     <None Include="clcert.pfx" />
     <None Include="packages.config" />
   </ItemGroup>

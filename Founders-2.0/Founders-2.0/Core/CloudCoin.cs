@@ -202,7 +202,8 @@ namespace CloudCoinCore
         {
             //The coin is considered fracked if it has any fails
             bool returnTruth = false;
-            if (charCount(pown, 'f') > 0 || charCount(pown, 'n') > 0)
+            //if (charCount(pown, 'f') > 0 || charCount(pown, 'n') > 0)
+            if (charCount(pown, 'f') > 0)
             {
                 returnTruth = true;
             }
@@ -468,6 +469,37 @@ namespace CloudCoinCore
 
         public void SortToFolder()
         {
+            if (charCount(pown, 'p') > 19)//Did 20 or more pass?
+            {
+                if (charCount(pown, 'p') > 0)//Any Fails?
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.FrackedFolder;
+                    return;
+                }
+                else//no fails
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.BankFolder;
+                    return;
+                }//There were fracked
+            }
+            else //less than 20 passed
+            {
+                if ((charCount(pown, 'p') + charCount(pown, 'f')) > 15)// is the RAIDA healthy
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.CounterfeitFolder;
+                    return;
+                }
+                else
+                {
+                    folder = RAIDA.ActiveRAIDA.FS.LostFolder;
+                    return;
+                }// end if RAIDA health low
+
+            }//end if else 20 did pass
+        }
+
+        public void SortToFolderOld()
+        {
             //figures out which folder to put it in. 
             //pown = pown.Replace('d', 'e').Replace('n', 'e').Replace('u', 'e');
             //pown = pown.Replace('n','e');
@@ -597,7 +629,8 @@ namespace CloudCoinCore
         {
             //The coin is considered ungradable if it does not get more than 19 RAIDA available
             bool returnTruth = false;
-            if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
+            //if (charCount(pown, 'f') + charCount(pown, 'p') > 16 && isFixable())
+            if (charCount(pown, 'f') + charCount(pown, 'p') > 19 && isFixable())
             {
                 returnTruth = true;
                 //Console.Out.WriteLine("isGradable");

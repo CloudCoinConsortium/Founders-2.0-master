@@ -35,7 +35,7 @@ namespace CloudCoinCore
 
         public enum Folder { Suspect, Counterfeit, Fracked, Bank, Trash };
 
-        public static string[] allowedExtensions = new[] { ".stack", ".jpeg", ".chest", ".bank", ".jpg",".celebrium",".celeb",".csv" };
+        public static string[] allowedExtensions = new[] { ".stack", ".jpeg",  ".jpg",".csv" };
 
         public static string TAG_DANGEROUS = "Dangerous";
         public static string TAG_LOGS = "Logs";

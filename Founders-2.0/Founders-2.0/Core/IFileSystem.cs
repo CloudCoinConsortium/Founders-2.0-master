@@ -12,6 +12,8 @@ using QRCoder;
 
 using System.Drawing;
 using ZXing;
+using Founders;
+using Founders.Utils;
 
 namespace CloudCoinCore
 {
@@ -68,6 +70,7 @@ namespace CloudCoinCore
         public List<CloudCoin> LoadCoinsByFormat(string folder, Formats format)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
 
             if (format == Formats.BarCode)
             {
@@ -90,7 +93,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -117,7 +120,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -144,7 +147,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
             }
@@ -161,7 +164,7 @@ namespace CloudCoinCore
         public List<CloudCoin> LoadFolderCoins(string folder)
         {
             List<CloudCoin> folderCoins = new List<CloudCoin>();
-
+            SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
 
             // Get All the supported CloudCoin Files from the folder
             var files = Directory
@@ -193,7 +196,7 @@ namespace CloudCoinCore
                     }
                     catch (Exception e)
                     {
-
+                        logger.Error(e.Message);
                     }
                 }
                 if( ext == ".csv")
@@ -207,8 +210,8 @@ namespace CloudCoinCore
                     {
                         CsvCoins.Add(CloudCoin.FromCSV(line));
                     }
-                    CsvCoins.ForEach(x => x.ExistingFileName = files[i]);
                     CsvCoins.RemoveAll(item => item == null);
+                    CsvCoins.ForEach(x => x.ExistingFileName = files[i]);
                     folderCoins.AddRange(CsvCoins);
                 }
             };
@@ -221,13 +224,47 @@ namespace CloudCoinCore
             CloudCoin coin = new CloudCoin();
 
             return coin;
+            //SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
+            //try
+            //{
+            //    Bitmap bitmap = new Bitmap(fileName);
+            //    BarcodeReader reader = new BarcodeReader { AutoRotate = true, TryInverted = true };
+            //    Result result = reader.Decode(bitmap);
+            //    string decoded = result.ToString().Trim();
+
+            //    CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+            //    bitmap.Dispose();
+            //    return cloudCoin;
+            //}
+            //catch (Exception e)
+            //{
+            //    logger.Error(e.Message);
+            //    return null;
+            //}
         }
 
         private CloudCoin ReadBARCode(String fileName)//Read a CloudCoin from BAR Code . 
         {
             CloudCoin coin = new CloudCoin();
-
             return coin;
+            //SimpleLogger logger = new SimpleLogger(LogsFolder + "logs" + DateTime.Now.ToString("yyyyMMdd").ToLower() + ".log", true);
+            //try
+            //{
+            //    var barcodeReader = new BarcodeReader();
+            //    Bitmap bitmap = new Bitmap(fileName);
+               
+            //    var barcodeResult = barcodeReader.Decode(bitmap);
+            //    string decoded = barcodeResult.ToString().Trim();
+
+            //    CloudCoin cloudCoin = JsonConvert.DeserializeObject<CloudCoin>(decoded);
+            //    bitmap.Dispose();
+            //    return cloudCoin;
+            //}
+            //catch (Exception e)
+            //{
+            //    logger.Error(e.Message);
+            //    return null;
+            //}
         }
 
         private List<CloudCoin> ReadCSVCoins(String fileName)//Read a CloudCoin from CSV . 
@@ -286,7 +323,7 @@ namespace CloudCoinCore
 
                 //   Console.Out.WriteLine("Loaded coin filename: " + tempCoin.fileName);
 
-                writeTo(SuspectFolder, tempCoin);
+                //writeTo(SuspectFolder, tempCoin);
                 return tempCoin;
             }
             catch (FileNotFoundException ex)
@@ -382,7 +419,8 @@ namespace CloudCoinCore
             {
                 Console.WriteLine("There was an error reading files in your bank.");
                 Console.WriteLine("You may have the aoid memo bug that uses too many double quote marks.");
-                Console.WriteLine("Your bank files are stored using and older version that did not use properly formed JSON.");
+                Console.WriteLine("Your bank files are stored using an older version,");
+                Console.WriteLine("that did not use properly formed JSON.");
                 Console.WriteLine("Would you like to upgrade these files to the newer standard?");
                 Console.WriteLine("Your files will be edited.");
                 Console.WriteLine("1 for yes, 2 for no.");
@@ -495,12 +533,13 @@ namespace CloudCoinCore
         public abstract void MoveImportedFiles();
         public void RemoveCoins(IEnumerable<CloudCoin> coins, string folder)
         {
+            
+                foreach (var coin in coins)
+                {
+                    File.Delete(folder + (coin.FileName) + ".stack");
 
-            foreach (var coin in coins)
-            {
-                File.Delete(folder + (coin.FileName) + ".stack");
-
-            }
+                }
+            
         }
 
         public void RemoveCoins(IEnumerable<CloudCoin> coins, string folder, string extension)
@@ -587,12 +626,29 @@ namespace CloudCoinCore
             }
         }
 
+        public void ExportCoinsToFile(IEnumerable<CloudCoin> coins, string fileName, string extension = ".stack")
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            Stack stack = new Stack(coins.ToArray());
+
+            ExportStack exportStack = new ExportStack(stack);
+            using (StreamWriter sw = new StreamWriter(fileName + extension))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, exportStack);
+            }
+        }
+
+
         public void WriteCoinsToFile(IEnumerable<CloudCoin> coins, string fileName, string extension = ".stack")
         {
             JsonSerializer serializer = new JsonSerializer();
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coins.ToArray());
+
             using (StreamWriter sw = new StreamWriter(fileName + extension))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
@@ -631,6 +687,7 @@ namespace CloudCoinCore
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coin);
+            
             using (StreamWriter sw = new StreamWriter(filename))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
@@ -647,7 +704,7 @@ namespace CloudCoinCore
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Stack stack = new Stack(coin);
 
-            Founders.Utils.ExportStack exportStack = new Founders.Utils.ExportStack(stack);
+            ExportStack exportStack = new ExportStack(stack);
 
             using (StreamWriter sw = new StreamWriter(filename))
             using (JsonWriter writer = new JsonTextWriter(sw))
@@ -655,7 +712,6 @@ namespace CloudCoinCore
                 serializer.Serialize(writer, exportStack);
             }
         }
-
 
         public void WriteCoin(IEnumerable<CloudCoin> coins, string folder,bool replaceExisting =true, bool writeAll = false)
         {

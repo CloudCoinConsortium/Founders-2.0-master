@@ -35,12 +35,12 @@ namespace CloudCoinCore
 
         public enum Folder { Suspect, Counterfeit, Fracked, Bank, Trash };
 
-        public static string[] allowedExtensions = new[] { ".stack", ".jpeg", ".chest", ".bank", ".jpg",".celebrium",".celeb",".csv" };
+        public static string[] allowedExtensions = new[] { ".stack", ".jpeg", ".jpg", ".csv" };
 
         public static string TAG_DANGEROUS = "Dangerous";
         public static string TAG_LOGS = "Logs";
-        public static string TAG_QR = "QrCodes";
-        public static string TAG_BARCODE = "Barcodes";
+        //public static string TAG_QR = "QrCodes";
+        //public static string TAG_BARCODE = "Barcodes";
         public static string TAG_CSV = "CSV";
 
         public static string URL_JPEG_Exists = "https://raida.tech/jpeg_exists.php?nn={0}&sn={1}";
