@@ -44,7 +44,7 @@ namespace CloudCoinClient.CoreClasses
             LogsFolder = RootPath + Path.DirectorySeparatorChar + Config.TAG_LOGS + Path.DirectorySeparatorChar;
             //QRFolder = ImportFolder + Config.TAG_QR + Path.DirectorySeparatorChar;
             //BarCodeFolder = ImportFolder + Config.TAG_BARCODE + Path.DirectorySeparatorChar;
-            CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
+            //CSVFolder = ImportFolder + Config.TAG_CSV + Path.DirectorySeparatorChar;
 
         }
         public override bool CreateFolderStructure()
@@ -112,7 +112,7 @@ namespace CloudCoinClient.CoreClasses
         public override void LoadFileSystem()
         {
             importCoins = LoadFolderCoins(ImportFolder);
-            var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
+            //var csvCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "CSV", Formats.CSV);
             //var qrCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "QrCodes", Formats.QRCode);
             //var BarCodeCoins = LoadCoinsByFormat(ImportFolder + Path.DirectorySeparatorChar + "Barcodes", Formats.BarCode);
 

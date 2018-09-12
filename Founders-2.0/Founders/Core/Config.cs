@@ -26,7 +26,7 @@ namespace CloudCoinCore
         public static string TAG_REQUESTS = "Requests";
         public const int YEARSTILEXPIRE = 2;
         public static int milliSecondsToTimeOut = 20000;
-        public static int MultiDetectLoad = 200;
+        public static int MultiDetectLoad = 400;
         public static int NodeCount = 25;
         public static int PassCount = 16;
         public static int MinimumReadyCount = 16;
